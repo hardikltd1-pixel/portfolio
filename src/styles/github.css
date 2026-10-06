@@ -1,0 +1,95 @@
+/* ===========================================================================
+   GITHUB SECTION
+   ======================================================================== */
+
+.github__panel {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: clamp(1.5rem, 4vw, 3rem);
+  padding: clamp(1.75rem, 5vw, 3.5rem);
+  border: 1px solid var(--line);
+  border-radius: var(--r-xl);
+  background:
+    linear-gradient(180deg, var(--surface-1), transparent 60%),
+    var(--bg-panel);
+  overflow: hidden;
+}
+
+.github__content {
+  position: relative;
+  z-index: 1;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.github__heading {
+  margin-bottom: 1rem;
+}
+
+/* On the panel the heading block needs no bottom margin of its own. */
+.github__heading .section-head__title {
+  font-size: clamp(1.6rem, 1.15rem + 1.9vw, 2.4rem);
+}
+
+.github__note {
+  color: var(--text-3);
+  font-size: var(--fs-sm);
+  max-width: 52ch;
+}
+
+.github__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  margin-top: clamp(1.5rem, 3vw, 2rem);
+}
+
+/* ---------------------------------------------------------- watermark */
+.github__watermark {
+  position: absolute;
+  right: -3%;
+  top: 50%;
+  translate: 0 -50%;
+  width: clamp(200px, 34vw, 380px);
+  height: auto;
+  color: var(--text-1);
+  opacity: 0.045;
+  pointer-events: none;
+}
+
+/* --------------------------------------------------------- code badge */
+.github__badge {
+  position: absolute;
+  right: clamp(1rem, 3vw, 2rem);
+  bottom: clamp(1rem, 2.5vw, 1.75rem);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.75rem;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--r-sm);
+  background: var(--bg-inset);
+  color: var(--text-3);
+  font-size: 0.7rem;
+  transition:
+    color var(--dur-mid) linear,
+    border-color var(--dur-mid) linear;
+}
+
+.github__badge svg {
+  width: 14px;
+  height: 14px;
+  color: var(--accent);
+}
+
+.github__panel:hover .github__badge {
+  border-color: var(--accent-line);
+  color: var(--text-2);
+}
+
+@media (max-width: 720px) {
+  .github__badge {
+    display: none;
+  }
+}

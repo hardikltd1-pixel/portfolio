@@ -1,0 +1,209 @@
+/* ===========================================================================
+   CURRENTLY LEARNING
+   ======================================================================== */
+
+.learning__header {
+  display: grid;
+  gap: 1.5rem;
+  align-items: end;
+}
+
+.learning__header .section-head {
+  margin-bottom: 0;
+}
+
+/* --------------------------------------------------------- cycle strip */
+.learning__cycle-wrap {
+  justify-self: start;
+}
+
+.learning__cycle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.55rem 0.95rem 0.55rem 0.8rem;
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  background: var(--surface-1);
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.04em;
+  color: var(--text-2);
+}
+
+.learning__cycle-part {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.learning__cycle-word {
+  position: relative;
+}
+
+/* Words pulse through dim → bright accent. data-index keeps this robust
+   against markup changes, unlike nth-child. */
+.learning__cycle-part[data-index='0'] .learning__cycle-word {
+  color: var(--accent);
+}
+
+.learning__cycle-part[data-index='1'] .learning__cycle-word {
+  color: var(--text-1);
+  animation: cycle-soft 3.6s var(--ease-in-out) infinite;
+}
+
+.learning__cycle-part[data-index='2'] .learning__cycle-word {
+  color: var(--text-1);
+  animation: cycle-soft 3.6s var(--ease-in-out) 1.2s infinite;
+}
+
+@keyframes cycle-soft {
+  0%,
+  55%,
+  100% {
+    color: var(--text-1);
+  }
+  75% {
+    color: var(--accent);
+  }
+}
+
+.learning__cycle-arrow {
+  width: 13px;
+  height: 13px;
+  color: var(--text-3);
+}
+
+.learning__cycle-dot {
+  width: 6px;
+  height: 6px;
+  margin-left: 0.2rem;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: cycle-blink 2.2s var(--ease-in-out) infinite;
+}
+
+@keyframes cycle-blink {
+  0%,
+  100% {
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .learning__cycle-part .learning__cycle-word,
+  .learning__cycle-dot {
+    animation: none !important;
+  }
+
+  .learning__cycle-part[data-index='0'] .learning__cycle-word {
+    color: var(--accent);
+  }
+
+  .learning__cycle-part[data-index='1'] .learning__cycle-word,
+  .learning__cycle-part[data-index='2'] .learning__cycle-word {
+    color: var(--text-1);
+  }
+}
+
+/* ---------------------------------------------------------------- cards */
+.learning__grid {
+  display: grid;
+  gap: 0.9rem;
+  margin-top: clamp(2rem, 4vw, 2.75rem);
+}
+
+.learning__card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: clamp(1.15rem, 2.4vw, 1.5rem);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+}
+
+.learning__icon {
+  margin-bottom: 0.6rem;
+}
+
+.learning__card:hover .learning__icon {
+  color: var(--accent);
+  border-color: var(--accent-line);
+  background: var(--accent-wash);
+  transform: translateY(-2px);
+}
+
+.learning__title {
+  font-size: 1.02rem;
+}
+
+.learning__body {
+  color: var(--text-2);
+  font-size: var(--fs-sm);
+}
+
+/* Indeterminate sweep — deliberately not a percentage. */
+.learning__sweep {
+  position: relative;
+  display: block;
+  height: 2px;
+  margin-top: 0.9rem;
+  border-radius: 2px;
+  background: var(--line-soft);
+  overflow: hidden;
+}
+
+.learning__sweep-bar {
+  position: absolute;
+  inset-block: 0;
+  width: 38%;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  transform: translateX(-100%);
+}
+
+.learning__card:hover .learning__sweep-bar {
+  animation: learning-sweep 2.4s var(--ease-in-out) infinite;
+}
+
+@keyframes learning-sweep {
+  0% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(320%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .learning__sweep {
+    display: none;
+  }
+}
+
+/* -------------------------------------------------------------- layout */
+@media (min-width: 700px) {
+  .learning__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 900px) {
+  .learning__header {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .learning__cycle-wrap {
+    justify-self: end;
+  }
+}
+
+@media (min-width: 1080px) {
+  .learning__grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}

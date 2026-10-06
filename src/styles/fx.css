@@ -1,0 +1,364 @@
+/* ===========================================================================
+   FX — loader, cursor glow, theme toggle, typing, meters and button shine.
+
+   The old 3D card tilt has been removed completely: nothing on this site uses
+   rotateX / rotateY / perspective. Cards stay flat and react with a small
+   translateY lift plus a glowing border.
+   =========================================================================== */
+
+/* ------------------------------------------------------------- loader
+   A short intro: the monogram wipes away behind an accent bar.
+   --------------------------------------------------------------------- */
+.loader {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: grid;
+  place-items: center;
+  background: var(--bg-base);
+  transition: opacity 380ms var(--ease-out), visibility 380ms linear;
+}
+
+.loader[data-leaving='true'] {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.loader__inner {
+  display: grid;
+  gap: 1.1rem;
+  justify-items: center;
+}
+
+.loader__mark {
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  border-radius: var(--r-md);
+  background: var(--silver-gradient);
+  color: var(--accent-contrast);
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  box-shadow: var(--shadow-accent);
+  animation: loader-mark-in 620ms var(--ease-spring) both;
+}
+
+.loader__bar {
+  position: relative;
+  display: block;
+  width: 132px;
+  height: 2px;
+  overflow: hidden;
+  border-radius: var(--r-pill);
+  background: var(--surface-2);
+}
+
+.loader__bar-fill {
+  position: absolute;
+  inset: 0;
+  background: var(--silver-gradient);
+  transform-origin: left center;
+  animation: loader-bar 620ms var(--ease-out) both;
+}
+
+@keyframes loader-mark-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.86);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes loader-bar {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* ---------------------------------------------------------- theme toggle
+   Sun and moon sit in the same box; CSS spins between them.
+   --------------------------------------------------------------------- */
+.theme-toggle {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--surface-1);
+  color: var(--text-2);
+  overflow: hidden;
+  transition:
+    color var(--dur-fast) linear,
+    border-color var(--dur-fast) linear,
+    background-color var(--dur-fast) linear,
+    transform var(--dur-fast) var(--ease-out);
+}
+
+.theme-toggle:hover {
+  color: var(--accent);
+  border-color: var(--accent-line);
+  background: var(--accent-wash);
+  transform: translateY(-2px);
+}
+
+.theme-toggle__track {
+  position: relative;
+  display: block;
+  width: 18px;
+  height: 18px;
+}
+
+.theme-toggle__icon {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  transition: transform 420ms var(--ease-spring), opacity 260ms linear;
+}
+
+.theme-toggle__icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Dark mode shows the sun; light mode shows the moon. */
+.theme-toggle__icon--sun {
+  opacity: 1;
+  transform: rotate(0deg) scale(1);
+}
+
+.theme-toggle__icon--moon {
+  opacity: 0;
+  transform: rotate(-90deg) scale(0.4);
+}
+
+:root[data-theme='light'] .theme-toggle__icon--sun {
+  opacity: 0;
+  transform: rotate(90deg) scale(0.4);
+}
+
+:root[data-theme='light'] .theme-toggle__icon--moon {
+  opacity: 1;
+  transform: rotate(0deg) scale(1);
+}
+/* ------------------------------------------------------------- typing
+   The roles line, typed out with a blinking caret.
+   --------------------------------------------------------------------- */
+.typing {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4ch;
+}
+
+.typing__text::after {
+  /* Keeps the line from collapsing while the first word is still typing. */
+  content: '\00a0';
+}
+
+.typing__caret {
+  display: inline-block;
+  width: 2px;
+  height: 1.05em;
+  border-radius: 1px;
+  background: var(--accent);
+  animation: caret-blink 1.05s steps(1) infinite;
+}
+
+@keyframes caret-blink {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* ---------------------------------------------------------- skill meters */
+.skill__meter {
+  position: relative;
+  height: 3px;
+  margin-top: 1.05rem;
+  overflow: hidden;
+  border-radius: var(--r-pill);
+  background: var(--surface-2);
+}
+
+.skill__meter-fill {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--silver-gradient);
+  transform: scaleX(var(--meter, 0.5));
+  transform-origin: left center;
+}
+
+/* The exploring group gets the warm accent instead. */
+.skills__grid--compact .skill__meter-fill {
+  background: var(--silver-gradient-soft);
+}
+
+/* ======================================================= pointer effects */
+
+/* Magnetic buttons: PointerFX writes --mag-x / --mag-y, CSS composes them
+   with the hover lift. No transition on transform — the rAF loop is what
+   smooths the motion, and a transition here would only fight it. */
+.btn {
+  --mag-x: 0px;
+  --mag-y: 0px;
+  --lift: 0px;
+  overflow: hidden;
+  transform: translate3d(var(--mag-x), calc(var(--mag-y) + var(--lift)), 0);
+}
+
+.btn:hover {
+  --lift: -3px;
+}
+
+.btn:active {
+  --lift: -1px;
+}
+
+/* Gradient shine sweep across the button face. */
+.btn__shine {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.btn__shine::before {
+  content: '';
+  position: absolute;
+  top: -60%;
+  bottom: -60%;
+  left: -60%;
+  width: 45%;
+  background: linear-gradient(
+    100deg,
+    transparent,
+    rgba(255, 255, 255, 0.42),
+    transparent
+  );
+  transform: translateX(-220%) rotate(12deg);
+  transition: transform 620ms var(--ease-out);
+}
+
+.btn:hover .btn__shine::before {
+  transform: translateX(520%) rotate(12deg);
+}
+
+/* The label sits above the sweep. */
+.btn > span:not(.btn__shine) {
+  position: relative;
+  z-index: 1;
+}
+
+/* Card hover. Flat and calm: a 4px lift and a brighter border, nothing else.
+   --card-lift is a custom property so the CSS hover state owns the transform
+   outright — no JS writes to it, so the pointer can never wobble a card. */
+.card--hover {
+  --card-lift: 0px;
+  transform: translate3d(0, var(--card-lift), 0);
+  transition:
+    transform var(--dur-mid) var(--ease-out),
+    border-color var(--dur-mid) linear,
+    box-shadow var(--dur-mid) var(--ease-out),
+    background-color var(--dur-mid) linear;
+}
+
+.card--hover:hover,
+.card--hover:focus-within {
+  --card-lift: -4px;
+}
+
+/* Accent glow border on hover, for every card. */
+.card--hover::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: var(--silver-gradient);
+  /* Only the border ring shows; the middle is masked out. */
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--dur-mid) var(--ease-out);
+}
+
+.card--hover:hover::after {
+  opacity: 0.85;
+}
+
+/* ================================================== GSAP hand-off rules
+   ScrollTrigger drives inline styles, so the CSS-transition fallback is
+   switched off to avoid two systems animating the same opacity.
+   --------------------------------------------------------------------- */
+.has-gsap .reveal {
+  transition: none;
+}
+
+.has-gsap .journey__rail-fill {
+  transition: none;
+}
+
+.has-gsap .skill__meter-fill {
+  /* Width comes from GSAP's scaleX; the CSS value is the fallback. */
+  transform: scaleX(var(--meter, 0.5));
+}
+
+/* The intro overlay delays the hero entrance so it lands as the loader clears. */
+.intro-active .hero-in {
+  animation-delay: calc(var(--d, 0ms) + 380ms);
+}
+
+/* ==================================================== reduced motion
+   Heavy motion is switched off; layout, colour and content are unchanged.
+   ======================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  .typing__caret,
+  .loader__mark,
+  .loader__bar-fill {
+    animation: none !important;
+  }
+
+  .loader {
+    display: none;
+  }
+
+  /* Nothing should be left invisible if the scrub animations never ran. */
+  .has-gsap .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .skill__meter-fill {
+    transform: scaleX(var(--meter, 0.5));
+  }
+
+  .btn {
+    transform: none;
+  }
+}

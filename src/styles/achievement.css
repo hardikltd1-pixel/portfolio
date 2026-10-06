@@ -1,0 +1,213 @@
+/* ===========================================================================
+   SIH ACHIEVEMENT
+   ======================================================================== */
+
+.achievement__card {
+  display: grid;
+  gap: clamp(1.5rem, 3.5vw, 2.5rem);
+  align-items: center;
+  padding: clamp(1.5rem, 4vw, 3rem);
+  border: 1px solid var(--line);
+  border-radius: var(--r-xl);
+  background:
+    radial-gradient(120% 130% at 8% 0%, var(--accent-wash), transparent 48%),
+    var(--bg-panel);
+  overflow: hidden;
+}
+
+/* ---------------------------------------------------------------- mark */
+.achievement__mark {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: clamp(112px, 22vw, 148px);
+  aspect-ratio: 1;
+  justify-self: center;
+}
+
+.achievement__ring {
+  position: absolute;
+  inset: 0;
+  border: 1px solid var(--accent-line);
+  border-radius: 50%;
+}
+
+.achievement__ring::before {
+  content: '';
+  position: absolute;
+  inset: 12px;
+  border: 1px dashed var(--line);
+  border-radius: 50%;
+}
+
+/* Very slow rotation — reads as "quiet", not "spinning prize". */
+.achievement__ring::after {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: 50%;
+  width: 6px;
+  height: 6px;
+  margin-left: -3px;
+  border-radius: 50%;
+  background: var(--accent);
+  transform-origin: 0 calc(50% + 3px);
+  animation: ring-turn 22s linear infinite;
+}
+
+@keyframes ring-turn {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .achievement__ring::after {
+    animation: none;
+  }
+}
+
+.achievement__trophy {
+  display: grid;
+  place-items: center;
+  width: 46%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+  color: var(--accent);
+  animation: trophy-float 5.5s var(--ease-in-out) infinite;
+}
+
+.achievement__trophy svg {
+  width: 52%;
+  height: 52%;
+}
+
+@keyframes trophy-float {
+  0%,
+  100% {
+    transform: translateY(-4px);
+  }
+  50% {
+    transform: translateY(4px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .achievement__trophy {
+    animation: none;
+  }
+}
+
+.achievement__year {
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  translate: -50% 0;
+  padding: 0.2rem 0.6rem;
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  background: var(--bg-base);
+  color: var(--text-3);
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+}
+
+/* ---------------------------------------------------------------- body */
+.achievement__body .tag {
+  margin-bottom: 1rem;
+}
+
+.achievement__title {
+  font-size: clamp(1.35rem, 1.05rem + 1.2vw, 1.95rem);
+  color: var(--accent);
+}
+
+.achievement__description {
+  margin-top: 0.9rem;
+  color: var(--text-2);
+  font-size: var(--fs-body);
+  max-width: 62ch;
+}
+
+/* ---------------------------------------------------------------- flow */
+.achievement__flow {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 0;
+  padding-top: clamp(1.25rem, 3vw, 1.75rem);
+  border-top: 1px solid var(--line-soft);
+}
+
+.achievement__flow-item {
+  display: flex;
+  align-items: center;
+}
+
+.achievement__flow-step {
+  padding: 0.5rem 0.95rem;
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  background: var(--surface-1);
+  color: var(--text-2);
+  white-space: nowrap;
+}
+
+.achievement__flow-label {
+  font-size: var(--fs-xs);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.achievement__flow-arrow {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  color: var(--text-3);
+}
+
+.achievement__flow-arrow svg {
+  width: 15px;
+  height: 15px;
+}
+
+.achievement__flow-item[data-state='accent'] .achievement__flow-step {
+  border-color: var(--accent);
+  background: var(--accent-wash-strong);
+  color: var(--accent);
+  font-weight: 500;
+}
+
+@media (min-width: 860px) {
+  .achievement__card {
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: clamp(2rem, 4.5vw, 3.5rem);
+  }
+
+  .achievement__mark {
+    justify-self: start;
+  }
+
+  /* Arrow points sideways once the steps sit on one row. */
+  .achievement__flow-arrow svg {
+    transform: rotate(-90deg);
+  }
+}
+
+@media (max-width: 520px) {
+  .achievement__flow-step {
+    padding: 0.42rem 0.7rem;
+  }
+
+  .achievement__flow-arrow {
+    width: 26px;
+  }
+
+  .achievement__flow-label {
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+  }
+}

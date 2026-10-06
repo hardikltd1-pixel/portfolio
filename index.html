@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" id="theme-color" content="#fff6ea" />
+    <meta name="color-scheme" content="light dark" />
+
+    <title>Hardik Goel — B.Tech Student &amp; Developer</title>
+    <meta
+      name="description"
+      content="Personal portfolio of Hardik Goel — first-year B.Tech student learning by building real projects with C and Python."
+    />
+    <meta name="author" content="Hardik Goel" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Hardik Goel — B.Tech Student &amp; Developer" />
+    <meta
+      property="og:description"
+      content="First-year B.Tech student learning by building real projects with C and Python."
+    />
+    <meta name="twitter:card" content="summary" />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+
+    <script>
+      // Runs before first paint so the page never flashes the wrong theme.
+      // 1. Drop the no-js flag (lets CSS skip work for no-JS visitors).
+      // 2. Pick a theme: saved choice first, Golden Hour otherwise.
+      ;(function () {
+        var root = document.documentElement
+        root.classList.remove('no-js')
+        try {
+          var saved = window.localStorage.getItem('portfolio-theme')
+          root.dataset.theme = saved === 'light' || saved === 'dark' ? saved : 'light'
+          var meta = document.getElementById('theme-color')
+          if (meta) meta.content = root.dataset.theme === 'dark' ? '#141a3a' : '#fff6ea'
+        } catch (error) {
+          root.dataset.theme = 'light'
+        }
+      })()
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <noscript>
+      <div style="padding: 2rem; font-family: system-ui, sans-serif; color: #1f2447; background: #fff6ea">
+        <h1 style="font-size: 1.5rem">Hardik Goel</h1>
+        <p>B.Tech Student &middot; Developer &middot; Builder</p>
+        <p>
+          This portfolio needs JavaScript for its scroll animations. Reach me on
+          <a style="color: #c2531a" href="mailto:[YOUR EMAIL]">[YOUR EMAIL]</a>
+          or
+          <a style="color: #c2531a" href="[YOUR GITHUB URL]">GitHub</a>.
+        </p>
+      </div>
+    </noscript>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

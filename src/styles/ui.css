@@ -1,0 +1,376 @@
+/* ===========================================================================
+   UI — shared primitives: reveal animation, buttons, tags, cards, notices
+   ======================================================================== */
+
+/* ------------------------------------------------------------- reveal
+   Every scroll animation on the site is driven by these three classes.
+   `data-in-view="true"` is added by the useInView hook. Transition-delay
+   comes from the `--reveal-delay` custom property so children can stagger
+   without inline JS timers.
+   --------------------------------------------------------------------- */
+
+.reveal {
+  --reveal-delay: 0ms;
+  opacity: 0;
+  transform: translate3d(0, 22px, 0);
+  transition:
+    opacity var(--dur-slow) var(--ease-out) var(--reveal-delay),
+    transform var(--dur-slow) var(--ease-out) var(--reveal-delay);
+}
+
+.reveal[data-variant='left'] {
+  transform: translate3d(-28px, 0, 0);
+}
+.reveal[data-variant='right'] {
+  transform: translate3d(28px, 0, 0);
+}
+.reveal[data-variant='scale'] {
+  transform: scale(0.955);
+}
+.reveal[data-variant='fade'] {
+  transform: none;
+}
+.reveal[data-variant='zoom'] {
+  transform: scale(0.94);
+}
+
+.reveal[data-in-view='true'] {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* On narrow screens sideways entrances would push content off-canvas and
+   look wrong anyway — every reveal moves up instead. */
+@media (max-width: 860px) {
+  .reveal[data-variant='left'],
+  .reveal[data-variant='right'] {
+    transform: translate3d(0, 22px, 0);
+  }
+}
+
+/* -------------------------------------------------------------- buttons */
+.btn {
+  --btn-fg: var(--text-1);
+  --btn-bg: transparent;
+  --btn-border: var(--line-strong);
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  padding: 0.78rem 1.4rem;
+  border: 1px solid var(--btn-border);
+  border-radius: var(--r-pill);
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  font-family: var(--font-body);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  transition:
+    border-color var(--dur-fast) linear,
+    background-color var(--dur-fast) linear,
+    color var(--dur-fast) linear,
+    box-shadow var(--dur-mid) var(--ease-out);
+}
+
+/* The hover lift and the magnetic offset both live in fx.css, which
+   composes them into a single transform. */
+
+.btn:active {
+  --lift: -1px;
+}
+
+/* Explicit size so inline SVGs never fall back to the 300×150 default. */
+.btn > svg {
+  width: 16px;
+  height: 16px;
+  flex: none;
+}
+
+.btn__arrow {
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+
+.btn:hover .btn__arrow {
+  transform: translate(2px, -2px);
+}
+
+/* Primary — solid accent gradient. `background-color` is the fallback for
+   browsers without color-mix(); `background-image` carries the gradient. */
+.btn--primary {
+  --btn-fg: var(--accent-contrast);
+  --btn-bg: var(--accent-deep);
+  --btn-border: transparent;
+  font-weight: 600;
+  background-color: var(--accent-fill-flat);
+  background-image: var(--accent-fill);
+}
+
+.btn--primary:hover {
+  --btn-fg: var(--accent-contrast);
+  --btn-bg: var(--accent-deep);
+  --btn-border: transparent;
+  box-shadow: var(--shadow-accent);
+}
+
+/* Secondary — outline, fills faintly on hover. */
+.btn--secondary {
+  --btn-fg: var(--text-1);
+  --btn-border: var(--line-strong);
+}
+
+.btn--secondary:hover {
+  --btn-border: var(--accent-line);
+  --btn-bg: var(--accent-wash);
+  --btn-fg: var(--accent);
+}
+
+/* Ghost — text only, used for tertiary actions. */
+.btn--ghost {
+  --btn-border: transparent;
+  --btn-fg: var(--text-2);
+  padding-inline: 0.85rem;
+}
+
+.btn--ghost:hover {
+  --btn-fg: var(--accent);
+}
+
+.btn--block {
+  width: 100%;
+}
+
+/* Placeholder link: still a real button, but visually flagged and honest. */
+.btn--placeholder {
+  --btn-border: var(--line);
+  --btn-fg: var(--text-3);
+  border-style: dashed;
+}
+
+.btn--placeholder:hover {
+  --btn-fg: var(--accent);
+  --btn-border: var(--accent-line);
+  --btn-bg: var(--accent-wash);
+}
+
+/* Animated underline used on text links. */
+.link-underline {
+  position: relative;
+  color: var(--text-1);
+  transition: color var(--dur-fast) linear;
+}
+
+.link-underline::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -3px;
+  width: 100%;
+  height: 1px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform var(--dur-mid) var(--ease-out);
+}
+
+.link-underline:hover {
+  color: var(--accent);
+}
+
+.link-underline:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* ----------------------------------------------------------------- tags */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.32rem 0.7rem;
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  background: var(--surface-1);
+  color: var(--text-2);
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  transition:
+    color var(--dur-fast) linear,
+    border-color var(--dur-fast) linear,
+    background-color var(--dur-fast) linear;
+}
+
+.tag--accent {
+  border-color: var(--accent-line);
+  background: var(--accent-wash);
+  color: var(--accent);
+}
+
+/* Small status pill (used on skill + learning cards). */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.22rem 0.6rem;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--line);
+  background: var(--surface-1);
+  color: var(--text-3);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.pill::before {
+  content: '';
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.pill--accent {
+  border-color: var(--accent-line);
+  background: var(--accent-wash);
+  color: var(--accent);
+}
+
+/* ---------------------------------------------------------------- cards */
+.card {
+  position: relative;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background:
+    linear-gradient(180deg, var(--surface-1), transparent 55%),
+    var(--bg-panel);
+  transition:
+    transform var(--dur-mid) var(--ease-out),
+    border-color var(--dur-mid) linear,
+    box-shadow var(--dur-mid) var(--ease-out),
+    background-color var(--dur-mid) linear;
+}
+
+/* The lift itself (--card-lift, transform, transition) is defined once in
+   fx.css next to the rest of the hover effects. Only the colour change is
+   declared here. */
+.card--hover:hover {
+  border-color: var(--line-strong);
+  box-shadow: var(--shadow-md);
+}
+
+/* Hairline highlight that traces the top edge of a card on hover. */
+.card--sheen::before {
+  content: '';
+  position: absolute;
+  inset-inline: 18%;
+  top: -1px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent-line), transparent);
+  opacity: 0;
+  transition: opacity var(--dur-mid) var(--ease-out);
+}
+
+.card--sheen:hover::before {
+  opacity: 1;
+}
+
+/* ---------------------------------------------------------- icon frame */
+.icon-frame {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--surface-1);
+  color: var(--text-2);
+  transition:
+    color var(--dur-mid) linear,
+    border-color var(--dur-mid) linear,
+    background-color var(--dur-mid) linear,
+    transform var(--dur-mid) var(--ease-spring);
+}
+
+.icon-frame svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* ------------------------------------------------------- section heading */
+.section-head {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: clamp(2.5rem, 5vw, 4rem);
+}
+
+.section-head__title {
+  display: flex;
+  align-items: baseline;
+  gap: 0.85rem;
+}
+
+.section-head__index {
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  color: var(--accent);
+  opacity: 0.85;
+}
+
+/* -------------------------------------------------------------- notice */
+.notice {
+  position: fixed;
+  left: 50%;
+  bottom: clamp(1rem, 3vw, 2rem);
+  z-index: 150;
+  transform: translate(-50%, 140%);
+  transition: transform var(--dur-slow) var(--ease-out);
+  pointer-events: none;
+  width: min(92vw, 30rem);
+}
+
+.notice[data-visible='true'] {
+  transform: translate(-50%, 0);
+}
+
+.notice__text {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  padding: 0.85rem 1.05rem;
+  border: 1px solid var(--accent-line);
+  border-radius: var(--r-md);
+  background: var(--bg-panel);
+  box-shadow: var(--shadow-lg);
+  color: var(--text-1);
+  font-size: var(--fs-sm);
+  line-height: 1.5;
+}
+
+.notice__dot {
+  flex: none;
+  width: 7px;
+  height: 7px;
+  margin-top: 0.5rem;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.notice__text code {
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  color: var(--accent);
+  overflow-wrap: anywhere;
+}

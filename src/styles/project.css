@@ -1,0 +1,311 @@
+/* ===========================================================================
+   FEATURED PROJECT
+   ======================================================================== */
+
+.project__card {
+  display: grid;
+  gap: clamp(1.75rem, 4vw, 0px);
+  border: 1px solid var(--line);
+  border-radius: var(--r-xl);
+  background:
+    linear-gradient(180deg, var(--surface-1), transparent 40%),
+    var(--bg-panel);
+  padding: clamp(1.15rem, 2.6vw, 1.75rem);
+  overflow: hidden;
+  transition:
+    transform var(--dur-slow) var(--ease-out),
+    border-color var(--dur-slow) linear,
+    box-shadow var(--dur-slow) var(--ease-out);
+}
+
+.project__card:hover {
+  transform: translateY(-6px);
+  border-color: var(--accent-line);
+  box-shadow: var(--shadow-lg);
+}
+
+/* ---------------------------------------------------------------- body */
+.project__body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: clamp(0.25rem, 1.5vw, 0.75rem) 0 0.35rem;
+}
+
+.project__label {
+  margin-bottom: 1.1rem;
+}
+
+.project__label svg {
+  width: 13px;
+  height: 13px;
+}
+
+.project__name {
+  font-size: clamp(1.5rem, 1.1rem + 1.5vw, 2.15rem);
+  line-height: 1.12;
+}
+
+.project__team {
+  margin-top: 0.6rem;
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.project__description {
+  margin-top: 1.15rem;
+  color: var(--text-2);
+  font-size: var(--fs-lead);
+  max-width: 52ch;
+}
+
+/* --------------------------------------------------------- highlights */
+.project__highlights {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-top: 1.4rem;
+  width: 100%;
+}
+
+.project__highlights li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  color: var(--text-2);
+  font-size: var(--fs-sm);
+}
+
+.project__highlights svg {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  margin-top: 0.28rem;
+  color: var(--accent);
+}
+
+/* --------------------------------------------------------------- tags */
+.project__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: 1.5rem;
+}
+
+.project__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  margin-top: 1.75rem;
+}
+
+/* -------------------------------------------------------------- media */
+.project__media {
+  position: relative;
+  margin: 0;
+}
+
+.project__media-inner {
+  position: relative;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  background: var(--bg-inset);
+}
+
+.project__media-inner img {
+  width: 100%;
+  height: auto;
+  display: block;
+  transition: transform 900ms var(--ease-out);
+}
+
+.project__card:hover .project__media-inner img {
+  transform: scale(1.035);
+}
+
+.project__media-caption {
+  margin-top: 0.75rem;
+  color: var(--text-3);
+  font-size: 0.72rem;
+  line-height: 1.6;
+}
+
+.project__media-caption code {
+  color: var(--text-2);
+  font-size: 0.9em;
+}
+
+/* --------------------------------------------- abstract cover (no image) */
+.project__mock {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 16 / 11;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  background:
+    radial-gradient(90% 70% at 50% 20%, rgba(242, 242, 245, 0.05), transparent 62%),
+    linear-gradient(180deg, var(--bg-panel), var(--bg-inset));
+}
+
+/* faint measurement grid */
+.project__mock-grid {
+  position: absolute;
+  inset: 0;
+  opacity: 0.5;
+  background-image:
+    linear-gradient(var(--line-soft) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
+  background-size: 34px 34px;
+  mask-image: radial-gradient(80% 70% at 50% 45%, #000 20%, transparent 78%);
+  -webkit-mask-image: radial-gradient(80% 70% at 50% 45%, #000 20%, transparent 78%);
+}
+
+.project__mock-corner {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  border: 1px solid var(--accent-line);
+  opacity: 0.7;
+  transition: opacity var(--dur-mid) linear, scale var(--dur-slow) var(--ease-out);
+}
+
+.project__mock-corner--tl {
+  top: 14px;
+  left: 14px;
+  border-right: 0;
+  border-bottom: 0;
+}
+.project__mock-corner--tr {
+  top: 14px;
+  right: 14px;
+  border-left: 0;
+  border-bottom: 0;
+}
+.project__mock-corner--bl {
+  bottom: 14px;
+  left: 14px;
+  border-right: 0;
+  border-top: 0;
+}
+.project__mock-corner--br {
+  bottom: 14px;
+  right: 14px;
+  border-left: 0;
+  border-top: 0;
+}
+
+.project__card:hover .project__mock-corner {
+  opacity: 1;
+  scale: 1.12;
+}
+
+.project__mock-leaf {
+  position: relative;
+  z-index: 1;
+  width: clamp(78px, 16vw, 132px);
+  height: auto;
+  color: var(--accent);
+  opacity: 0.9;
+  transform: translateY(-8%);
+  transition:
+    transform 900ms var(--ease-out),
+    opacity var(--dur-slow) linear;
+}
+
+.project__card:hover .project__mock-leaf {
+  transform: translateY(-11%) scale(1.035);
+  opacity: 1;
+}
+
+/* Slow scan pass over the cover. Transform-only. */
+.project__mock-scan {
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  height: 26%;
+  z-index: 2;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(242, 242, 245, 0.07),
+    transparent
+  );
+  opacity: 0;
+}
+
+.project__mock[data-in-view='true'] .project__mock-scan {
+  animation: project-scan 5.5s var(--ease-in-out) 0.6s infinite;
+}
+
+@keyframes project-scan {
+  0% {
+    transform: translateY(-120%);
+    opacity: 0;
+  }
+  18% {
+    opacity: 1;
+  }
+  82% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(390%);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .project__mock-scan {
+    display: none;
+  }
+}
+
+.project__mock-caption {
+  position: absolute;
+  inset-inline: 14px;
+  bottom: 12px;
+  z-index: 3;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-2);
+  font-size: var(--fs-mono);
+}
+
+.project__mock-meta {
+  color: var(--text-3);
+}
+
+.project__mock-note {
+  margin-left: auto;
+  padding: 0.15rem 0.5rem;
+  border: 1px dashed var(--line);
+  border-radius: var(--r-pill);
+  color: var(--text-3);
+  font-family: var(--font-body);
+  font-size: 0.66rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 460px) {
+  .project__mock-note {
+    display: none;
+  }
+}
+
+/* ------------------------------------------------------------ layout */
+@media (min-width: 900px) {
+  .project__card {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.02fr);
+    gap: clamp(2.25rem, 4.5vw, 3.5rem);
+    align-items: center;
+    padding: clamp(1.5rem, 3vw, 2.25rem);
+  }
+}

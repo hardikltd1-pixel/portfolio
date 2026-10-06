@@ -1,0 +1,244 @@
+/* ===========================================================================
+   DESIGN TOKENS — GOLDEN HOUR (default) + DUSK
+   ---------------------------------------------------------------------------
+   TWO THEMES
+      Golden Hour  (default) — warm cream canvas, deep navy ink, glowing amber
+                     and coral accents. Set as `data-theme="light"` on <html>.
+      Dusk                 — deep indigo canvas, pale ink, amber / coral / sky
+                     accents. Set as `data-theme="dark"` on <html>.
+      The attribute values stay light / dark so `color-scheme`, the stored
+      choice and the existing toggle keep working; the names above are what the
+      themes are called in the UI. A first-time visitor gets Golden Hour.
+
+   HOW TO RE-SKIN
+     Every colour lives in the two blocks below. Golden Hour is `:root` so a
+     value always exists; Dusk overrides the same semantic names. Nothing else
+     on the site declares a raw colour for chrome — gradients, borders, glows,
+     hover states and tinted surfaces all derive from these.
+
+     The hero artwork is the one exception: it is a photograph-like illustration
+     (public/images/room.webp) and keeps its own palette.
+
+    PALETTE (change these three lines to re-tint the site)
+      --accent          warm ink accent  — text, borders, dots, focus rings
+      --accent-fill     bright fill      — primary buttons, meters, progress bar
+      --bg-base         page canvas
+   =========================================================================== */
+
+/* ------------------------------------------------------- shared constants */
+:root {
+  /* ------------------------------------------------------------ typography */
+  --font-display: 'Space Grotesk', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-body: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'Cascadia Code', 'Consolas', monospace;
+
+  /* Fluid type scale — clamp keeps headings readable from 360px to 1600px */
+  --fs-display: clamp(2.65rem, 1.5rem + 5.4vw, 6rem);
+  --fs-h2: clamp(1.85rem, 1.15rem + 2.6vw, 3.1rem);
+  --fs-h3: clamp(1.15rem, 1.02rem + 0.5vw, 1.4rem);
+  --fs-lead: clamp(1rem, 0.95rem + 0.32vw, 1.16rem);
+  --fs-body: clamp(0.95rem, 0.92rem + 0.14vw, 1.02rem);
+  --fs-sm: 0.875rem;
+  --fs-xs: 0.78rem;
+  --fs-mono: 0.82rem;
+
+  /* -------------------------------------------------------------- spacing */
+  --gutter: clamp(1.15rem, 4vw, 2.5rem);
+  --section-y: clamp(4.5rem, 9vw, 8.5rem);
+  --container: 1160px;
+  --nav-h: 68px;
+
+  /* --------------------------------------------------------------- radii */
+  --r-xs: 6px;
+  --r-sm: 10px;
+  --r-md: 14px;
+  --r-lg: 20px;
+  --r-xl: 28px;
+  --r-pill: 999px;
+
+  /* -------------------------------------------------------------- easing */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-spring: cubic-bezier(0.22, 1.2, 0.36, 1);
+
+  /* ----------------------------------------------------------- durations */
+  --dur-fast: 180ms;
+  --dur-mid: 320ms;
+  --dur-slow: 700ms;
+  /* Colour cross-fade when the Golden Hour / Dusk toggle is used. */
+  --theme-dur: 0.4s;
+}
+
+/* ===========================================================================
+   GOLDEN HOUR — default theme (data-theme="light")
+   ======================================================================== */
+:root {
+  /* ------------------------------------------------------------ surfaces */
+  --bg-base: #fff6ea;
+  --bg-raised: #fffdf8;
+  --bg-panel: #ffffff;
+  --bg-inset: #fbf0e1;
+
+  --surface-1: rgba(31, 36, 71, 0.032);
+  --surface-2: rgba(31, 36, 71, 0.055);
+  --surface-3: rgba(31, 36, 71, 0.085);
+
+  /* -------------------------------------------------------------- borders */
+  --line-soft: rgba(31, 36, 71, 0.09);
+  --line: #eaddc8;
+  --line-strong: rgba(31, 36, 71, 0.24);
+
+  /* ----------------------------------------------------------------- text */
+  --text-1: #1f2447;
+  --text-2: #4a4f6b;
+  --text-3: #6c7089;
+
+  /* --------------------------------------------------------------- accent
+     Burnt amber: dark enough to read as text on cream, warm enough to feel
+     like late-afternoon sun. The bright orange lives in --accent-fill. */
+  --accent: #c2531a;
+  --accent-bright: #ff9a3d;
+  --accent-deep: #c2531a;
+  --accent-wash: rgba(255, 154, 61, 0.14);
+  --accent-wash-strong: rgba(255, 154, 61, 0.24);
+  --accent-line: rgba(194, 83, 26, 0.42);
+  --accent-contrast: #1f2447;
+
+  /* Primary button / meter fill: the glowing part of the palette. */
+  --accent-fill-flat: #ff9a3d;
+  --accent-fill: linear-gradient(120deg, #ff9a3d, #ff8151 52%, #ff6b6b);
+
+  /* Gradient used by meters, the scroll bar, the loader and card rings. */
+  --brand-light: #ff9a3d;
+  --brand-dim: #ff6b6b;
+  --silver-gradient: linear-gradient(115deg, var(--brand-light), var(--brand-dim));
+  --silver-gradient-soft: linear-gradient(
+    135deg,
+    rgba(255, 154, 61, 0.28),
+    rgba(255, 107, 107, 0.2) 55%,
+    rgba(91, 168, 255, 0.16)
+  );
+
+  /* --------------------------------------------------- glass navbar tokens */
+  --nav-bg: rgba(255, 246, 234, 0.82);
+  --nav-border: rgba(31, 36, 71, 0.09);
+  --nav-shadow: 0 10px 34px -20px rgba(96, 62, 24, 0.5);
+
+  --selection-bg: #c2531a;
+  --selection-fg: #fff6ea;
+
+  /* ------------------------------------------------------------ scrollbar */
+  --scrollbar-thumb: #e6d5bc;
+  --scrollbar-thumb-hover: #d3bd9c;
+
+  /* -------------------------------------------------------------- shadows
+     Warm rather than grey — golden hour light, not office light. */
+  --shadow-sm: 0 1px 2px rgba(96, 62, 24, 0.1);
+  --shadow-md: 0 18px 40px -26px rgba(96, 62, 24, 0.36);
+  --shadow-lg: 0 34px 70px -40px rgba(96, 62, 24, 0.42);
+  --shadow-accent: 0 14px 38px -20px rgba(255, 154, 61, 0.6);
+
+  /* The wash that sits behind everything (base.css -> body::before). */
+  --wash-a: rgba(255, 154, 61, 0.2);
+  --wash-b: rgba(91, 168, 255, 0.14);
+
+  color-scheme: light;
+}
+
+/* ===========================================================================
+   DUSK — dark theme (data-theme="dark")
+   Deep indigo rather than black, so amber still feels like light.
+   ======================================================================== */
+:root[data-theme='dark'] {
+  /* ------------------------------------------------------------ surfaces */
+  --bg-base: #141a3a;
+  --bg-raised: #1a214a;
+  --bg-panel: #1d2550;
+  --bg-inset: #101535;
+
+  --surface-1: rgba(233, 237, 255, 0.045);
+  --surface-2: rgba(233, 237, 255, 0.075);
+  --surface-3: rgba(233, 237, 255, 0.11);
+
+  /* -------------------------------------------------------------- borders */
+  --line-soft: rgba(233, 237, 255, 0.09);
+  --line: #2a3163;
+  --line-strong: rgba(233, 237, 255, 0.26);
+
+  /* ----------------------------------------------------------------- text */
+  --text-1: #e9edff;
+  --text-2: #a9b2e0;
+  --text-3: #8c95c7;
+
+  /* --------------------------------------------------------------- accent */
+  --accent: #ffb547;
+  --accent-bright: #ffd79a;
+  --accent-deep: #ff9a3d;
+  --accent-wash: rgba(255, 181, 71, 0.14);
+  --accent-wash-strong: rgba(255, 181, 71, 0.24);
+  --accent-line: rgba(255, 181, 71, 0.45);
+  --accent-contrast: #141a3a;
+
+  --accent-fill-flat: #ffb547;
+  --accent-fill: linear-gradient(120deg, #ffb547, #ff9a3d 52%, #ff6b6b);
+
+  --brand-light: #ffb547;
+  --brand-dim: #ff6b6b;
+  --silver-gradient: linear-gradient(115deg, var(--brand-light), var(--brand-dim));
+  --silver-gradient-soft: linear-gradient(
+    135deg,
+    rgba(255, 181, 71, 0.3),
+    rgba(255, 107, 107, 0.22) 55%,
+    rgba(91, 168, 255, 0.18)
+  );
+
+  /* --------------------------------------------------- glass navbar tokens */
+  --nav-bg: rgba(20, 26, 58, 0.8);
+  --nav-border: rgba(233, 237, 255, 0.1);
+  --nav-shadow: 0 10px 34px -20px rgba(0, 0, 0, 0.75);
+
+  --selection-bg: #ffb547;
+  --selection-fg: #141a3a;
+
+  /* ------------------------------------------------------------ scrollbar */
+  --scrollbar-thumb: #2c3467;
+  --scrollbar-thumb-hover: #3d468a;
+
+  /* -------------------------------------------------------------- shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.45);
+  --shadow-md: 0 18px 40px -26px rgba(0, 0, 0, 0.75);
+  --shadow-lg: 0 34px 70px -40px rgba(0, 0, 0, 0.85);
+  --shadow-accent: 0 14px 38px -20px rgba(255, 181, 71, 0.4);
+
+  --wash-a: rgba(255, 154, 61, 0.16);
+  --wash-b: rgba(91, 168, 255, 0.14);
+
+  color-scheme: dark;
+}
+
+/* ===========================================================================
+   THEME CROSS-FADE
+   `theme-anim` is added to <html> for the length of the switch only, so hover
+   transitions elsewhere are never slowed down.
+   ======================================================================== */
+:root.theme-anim body,
+:root.theme-anim .section,
+:root.theme-anim .card,
+:root.theme-anim .btn,
+:root.theme-anim .nav,
+:root.theme-anim .nav__panel,
+:root.theme-anim .nav__mark,
+:root.theme-anim .pill,
+:root.theme-anim .tag,
+:root.theme-anim .icon-frame,
+:root.theme-anim .terminal,
+:root.theme-anim .notice__text,
+:root.theme-anim .scroll-progress__bar {
+  transition:
+    background-color var(--theme-dur) var(--ease-out),
+    border-color var(--theme-dur) var(--ease-out),
+    color var(--theme-dur) var(--ease-out),
+    box-shadow var(--theme-dur) var(--ease-out),
+    fill var(--theme-dur) var(--ease-out),
+    stroke var(--theme-dur) var(--ease-out);
+}

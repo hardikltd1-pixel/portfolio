@@ -1,0 +1,81 @@
+
+> personal-portfolio@1.0.0 dev
+> vite
+
+
+  [32m[1mVITE[22m v5.4.21[39m  [2mready in [0m[1m662[22m[2m[0m ms[22m
+
+  [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5173[22m/[39m
+[2m  [32m➜[39m  [1mNetwork[22m[2m: use [22m[1m--host[22m[2m to expose[22m
+[2m[32m  ➜[39m[22m[2m  press [22m[1mh + enter[22m[2m to show help[22m
+[2m9:26:32 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/Navbar.jsx, /src/components/PageLoader.jsx, /src/components/Skills.jsx, /src/components/FeaturedProject.jsx, /src/components/Timeline.jsx, /src/components/Hero.jsx, /src/components/CurrentlyLearning.jsx, /src/components/About.jsx, /src/components/Contact.jsx, /src/components/GithubSection.jsx, /src/components/Footer.jsx, /src/components/Achievement.jsx, /src/components/TerminalCard.jsx[22m
+[2m9:26:37 am[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2mindex.html[22m
+[2m9:26:41 am[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2mindex.html[22m
+[2m9:26:44 am[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2mindex.html[22m
+[2m9:26:47 am[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2mindex.html[22m
+[2m9:27:15 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/styles/tokens.css[22m
+[2m9:28:55 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/styles/base.css[22m
+[2m9:28:57 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/styles/hero.css[22m
+[2m9:28:59 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/styles/project.css[22m
+[2m9:29:01 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/styles/project.css[22m
+[2m9:29:09 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/ThemeToggle.jsx[22m
+[2m9:29:09 am[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2mindex.html[22m
+[2m9:29:30 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/PointerFX.jsx[22m
+[2m9:29:37 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/About.jsx[22m
+[2m9:29:37 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/CurrentlyLearning.jsx[22m
+[2m9:29:37 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/Skills.jsx[22m
+[2m9:29:46 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/Achievement.jsx[22m
+[2m9:30:20 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/ScrollFX.jsx, /src/components/Reveal.jsx[22m
+[2m9:30:34 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/ScrollFX.jsx[22m
+[2m9:30:42 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/styles/fx.css[22m
+[2m9:30:47 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/styles/fx.css[22m
+[2m9:31:04 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/styles/ui.css[22m
+[2m9:31:25 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/styles/fx.css[22m
+[2m9:31:33 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/styles/fx.css[22m
+[2m9:31:36 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/styles/hero.css[22m
+[2m9:31:40 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/styles/fx.css[22m
+[2m9:31:40 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/styles/navbar.css[22m
+[2m9:31:43 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/HeroBackdrop.jsx[22m
+[2m9:33:14 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/TypingRoles.jsx[22m
+[2m9:33:17 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/TypingRoles.jsx[22m
+[2m9:33:22 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/TypingRoles.jsx[22m
+[2m9:35:24 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/Hero.jsx[22m
+[2m9:36:37 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/DesktopScene.jsx[22m
+[2m9:36:40 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/App.jsx[22m
+[2m9:37:01 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/styles/hero.css[22m
+[2m9:37:05 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/styles/hero.css[22m
+[2m9:37:15 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/Hero.jsx[22m
+[2m9:37:17 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/Hero.jsx[22m
+[2m9:37:32 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/styles/navbar.css[22m
+[2m9:37:45 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/Navbar.jsx[22m
+[2m9:39:44 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/DesktopScene.jsx[22m
+[2m9:39:50 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/DesktopScene.jsx[22m
+[2m9:39:59 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/DesktopScene.jsx[22m
+[2m9:40:10 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/Hero.jsx[22m
+[2m9:40:13 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/Hero.jsx[22m
+[2m9:40:16 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/Hero.jsx[22m
+[2m9:40:21 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/HeroScreen.jsx[22m
+[2m9:42:41 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/HeroContent.jsx[22m
+[2m9:53:23 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/Hero.jsx[22m
+[2m9:53:27 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/Hero.jsx[22m
+[2m9:53:30 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/Hero.jsx[22m
+[2m9:53:42 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/Hero.jsx[22m
+[2m9:53:49 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/styles/desktop.css[22m
+[2m9:53:54 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/styles/desktop.css[22m
+[2m9:53:58 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/styles/desktop.css[22m
+[2m9:54:02 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/styles/desktop.css[22m
+[2m9:54:06 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/styles/desktop.css[22m
+[2m10:06:31 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/styles/desktop.css[22m
+[2m10:06:36 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/styles/desktop.css[22m
+[2m10:06:41 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/styles/desktop.css[22m
+[2m10:06:44 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/styles/desktop.css[22m
+[2m10:06:49 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/styles/desktop.css[22m
+[2m10:06:52 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/styles/desktop.css[22m
+[2m10:06:54 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/styles/desktop.css[22m
+[2m10:06:56 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/styles/desktop.css[22m
+[2m10:06:59 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/styles/desktop.css[22m
+[2m10:07:01 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/styles/desktop.css[22m
+[2m10:07:04 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/styles/desktop.css[22m
+[2m10:07:07 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/styles/desktop.css[22m
+[2m10:07:10 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/styles/desktop.css[22m
+[2m10:07:13 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/styles/desktop.css[22m

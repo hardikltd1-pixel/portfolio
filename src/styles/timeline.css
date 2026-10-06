@@ -1,0 +1,152 @@
+/* ===========================================================================
+   JOURNEY / TIMELINE
+   The rail sits in a dedicated dot column, so both the mobile and desktop
+   layouts share one set of offsets — no magic numbers per breakpoint.
+   ======================================================================== */
+
+.journey__layout {
+  position: relative;
+}
+
+/* ----------------------------------------------------------------- rail */
+.journey__rail {
+  position: absolute;
+  top: 8px;
+  bottom: 30px;
+  /* 4.5px == centre of the 9px dot column below, including its border */
+  left: 4.5px;
+  width: 1px;
+}
+
+.journey__rail-base,
+.journey__rail-fill {
+  position: absolute;
+  inset: 0;
+}
+
+.journey__rail-base {
+  background: var(--line);
+}
+
+.journey__rail-fill {
+  background: linear-gradient(180deg, var(--accent), var(--accent-line) 72%, transparent);
+  transform: scaleY(0);
+  transform-origin: top center;
+  transition: transform 1400ms var(--ease-out);
+}
+
+.journey__rail[data-in-view='true'] .journey__rail-fill {
+  transform: scaleY(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .journey__rail-fill {
+    transition: none;
+    transform: scaleY(1);
+  }
+}
+
+/* ----------------------------------------------------------------- list */
+.journey__list {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.6rem, 4vw, 2.6rem);
+}
+
+.journey__item {
+  display: grid;
+  grid-template-columns: 9px minmax(0, 1fr);
+  column-gap: clamp(0.95rem, 2.5vw, 1.5rem);
+  align-items: start;
+}
+
+/* ------------------------------------------------------------------ dot */
+.journey__dot {
+  justify-self: center;
+  margin-top: 7px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--bg-base);
+  border: 1px solid var(--accent-line);
+  transition:
+    background-color var(--dur-mid) linear,
+    scale var(--dur-mid) var(--ease-spring);
+}
+
+.journey__item:hover .journey__dot {
+  background: var(--accent);
+  scale: 1.3;
+}
+
+.journey__dot[data-upcoming] {
+  border-style: dashed;
+  border-color: var(--line-strong);
+}
+
+.journey__dot--outro {
+  border-style: dotted;
+  border-color: var(--text-3);
+}
+
+/* -------------------------------------------------------------- content */
+.journey__year {
+  display: inline-block;
+  color: var(--accent);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.14em;
+}
+
+.journey__item-title {
+  margin-top: 0.35rem;
+  font-size: clamp(1.08rem, 1rem + 0.35vw, 1.28rem);
+}
+
+.journey__body {
+  margin-top: 0.45rem;
+  color: var(--text-2);
+  font-size: var(--fs-sm);
+}
+
+.journey__outro {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--text-3);
+  font-size: var(--fs-sm);
+  font-style: italic;
+}
+
+.journey__outro svg {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  color: var(--accent);
+  transform: rotate(-45deg);
+}
+
+/* ------------------------------------------------------------ desktop */
+@media (min-width: 900px) {
+  .journey__item {
+    column-gap: clamp(2.25rem, 5vw, 4.25rem);
+  }
+
+  .journey__content {
+    display: grid;
+    grid-template-columns: 118px minmax(0, 1fr);
+    column-gap: clamp(1.5rem, 3vw, 2.5rem);
+    align-items: start;
+  }
+
+  .journey__year {
+    padding-top: 0.35rem;
+  }
+
+  .journey__item-title {
+    margin-top: 0;
+  }
+
+  .journey__body {
+    max-width: 62ch;
+  }
+}

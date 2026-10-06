@@ -1,0 +1,717 @@
+/* ===========================================================================
+   ROOM HERO — the video room, the monitor screen and the zoom into the site
+   ---------------------------------------------------------------------------
+   STRUCTURE
+     .hero                 tall spacer that creates the scroll travel
+     .hero__stage          sticky, one viewport tall, clips everything
+     .hero__frame          the room: video + ambient FX + the screen, in ONE
+                           box so the screen can never drift off the artwork
+     .hero__room           the video layer — fades out as the zoom closes in
+     .hero__screen         the monitor glass: a viewport-sized page, scaled
+       .hero__mini           that page, scaled and nudged by the intro hook
+       .hero__glass          tint, scanlines, vignette, reflection, flicker
+       .hero__cursor-wrap    the little cursor wandering over the screen
+       .hero__boot           the one-time power-on
+       .hero__screen-hit     the click / tap target that opens the site
+     .hero__real           the same content, once it has become the page
+     .hero__page           the page box — identical in both places, which is
+                           what makes the handoff invisible
+
+   GEOMETRY  (public/videos/room.mp4 — 1280 × 630)
+      The monitor glass sits at 28.9% / 37.9% of the video frame, 27.7% × 27.8%.
+      The frame is sized to the video's aspect ratio (see ROOM_AR in
+      src/hooks/useRoomIntro.js), so these percentages land exactly on the
+      glass — keep the two in sync if the video is ever re-cropped.
+
+   SCROLL LENGTH
+     --intro-len below is the travel, in viewport heights. Keep it equal to
+     INTRO.length in src/hooks/useRoomIntro.js (135svh <-> 1.35).
+
+   NO MOUSE PARALLAX
+     Nothing in the room moves with the pointer. The screen stays welded to the
+     artwork; only the glass reflection slides a little, like light on glass.
+   =========================================================================== */
+
+.hero {
+  --intro-len: 135svh;
+
+  /* Where the room fades out and where the swap is allowed to happen. */
+  --room-fade-from: 0.55;
+  --room-fade-to: 0.92;
+
+  /* ---- monitor glass, as a fraction of the video frame (see the header) ---- */
+  --screen-l: 28.9%;
+  --screen-t: 37.9%;
+  --screen-w: 27.7%;
+  --screen-h: 27.8%;
+
+  /* 1 while the zoom starts, 0 by the time the screen fills the view. Every
+     glass layer fades with it so the page ends up at full, true brightness. */
+  --glass-a: calc(1 - clamp(0, var(--intro-p, 0) * 1.6, 1));
+
+  /* The cursor's loop. The button pulse uses the same numbers to stay in step. */
+  --cursor-loop: 14s;
+  --cursor-delay: 2.4s;
+
+  position: relative;
+  z-index: 1;
+  background: var(--bg-base);
+}
+
+/* Tall enough to give the sticky stage something to travel through. */
+.hero[data-intro='on'] {
+  height: calc(100svh + var(--intro-len));
+}
+
+/* The stage holds the viewport for the whole intro, then scrolls away. */
+.hero__stage {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* ============================================================ the room frame
+   Sized by the hook (cover + enough bleed to centre the monitor), transformed
+   as one piece: the picture and the screen can never separate. */
+.hero__frame {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: var(--fw, 100%);
+  height: var(--fh, 100%);
+  margin-left: var(--ax, 0);
+  margin-top: var(--ay, 0);
+  transform: scale(var(--zoom-s, 1));
+  transform-origin: var(--ox, 50%) var(--oy, 50%);
+  z-index: 1;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 420ms var(--ease-out);
+}
+
+.hero__frame[data-loaded='true'] {
+  opacity: 1;
+}
+
+/* -------------------------------------------------------- the picture layer
+   No transform here any more (that was the mouse parallax). Opacity only. */
+.hero__room {
+  position: absolute;
+  inset: 0;
+  opacity: calc(1 - clamp(0, (var(--intro-p, 0) - var(--room-fade-from)) /
+          (var(--room-fade-to) - var(--room-fade-from)), 1));
+  will-change: opacity;
+}
+
+.hero__room picture,
+.hero__room img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ---------------------------------------------------------------- the video
+   Same box and same cover/centre fit as the picture it sits on top of, so the
+   two never disagree about where the monitor is. It fades in over the poster
+   once it has decoded a frame — opacity only. */
+.hero__room .hero__video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  opacity: 0;
+  transition: opacity 620ms var(--ease-out);
+  will-change: opacity;
+}
+
+.hero__video[data-ready='true'] {
+  opacity: 1;
+}
+
+/* ---------------------------------------------------------------- sunlight
+   Two blurred diagonals drifting across the wall. The blur lives on an inner
+   element so only the wrapper has to move — the expensive part never repaints. */
+.hero__ray {
+  position: absolute;
+  top: -40%;
+  height: 180%;
+  mix-blend-mode: screen;
+  opacity: 0.75;
+  animation: ray-drift 22s ease-in-out infinite alternate;
+}
+
+.hero__ray--a {
+  left: 6%;
+  width: 22%;
+  animation-duration: 26s;
+}
+
+.hero__ray--b {
+  left: 34%;
+  width: 14%;
+  animation-delay: -9s;
+  animation-duration: 32s;
+  opacity: 0.5;
+}
+
+.hero__ray-inner {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    172deg,
+    rgba(255, 214, 150, 0.55),
+    rgba(255, 214, 150, 0.12) 46%,
+    transparent 78%
+  );
+  filter: blur(26px);
+  transform: rotate(16deg);
+}
+
+@keyframes ray-drift {
+  from {
+    transform: translate3d(-3%, 0, 0);
+  }
+  to {
+    transform: translate3d(7%, 2.5%, 0);
+  }
+}
+
+/* -------------------------------------------------------------------- dust
+   Twenty motes, transform + opacity only. */
+.hero__dust {
+  position: absolute;
+  width: var(--size, 3px);
+  height: var(--size, 3px);
+  border-radius: 50%;
+  background: rgba(255, 233, 199, 0.8);
+  animation: dust-float var(--dur, 26s) linear var(--delay, 0s) infinite;
+  will-change: transform, opacity;
+}
+
+@keyframes dust-float {
+  0% {
+    transform: translate3d(0, 0, 0);
+    opacity: 0;
+  }
+  12% {
+    opacity: var(--alpha, 0.7);
+  }
+  85% {
+    opacity: var(--alpha, 0.7);
+  }
+  100% {
+    transform: translate3d(var(--drift, 18px), -46px, 0);
+    opacity: 0;
+  }
+}
+
+/* ------------------------------------------------------------- monitor glow
+   The light the screen throws into the room, pulsing gently. */
+.hero__glow {
+  position: absolute;
+  left: calc(var(--screen-l) + var(--screen-w) / 2);
+  top: calc(var(--screen-t) + var(--screen-h) / 2);
+  width: 46%;
+  height: 38%;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(closest-side, rgba(255, 199, 143, 0.5), transparent 72%);
+  filter: blur(16px);
+  mix-blend-mode: screen;
+  animation: glow-pulse 5.2s ease-in-out infinite;
+}
+
+@keyframes glow-pulse {
+  0%,
+  100% {
+    opacity: 0.72;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* ------------------------------------------------------- light on the desk
+   Spills from the bottom edge of the screen onto the keyboard and desk. Quiet
+   by default, lights up while the mouse is over the monitor. */
+.hero__spill {
+  position: absolute;
+  left: calc(var(--screen-l) + var(--screen-w) / 2);
+  top: calc(var(--screen-t) + var(--screen-h) * 1.18);
+  width: 54%;
+  height: 40%;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(
+    closest-side,
+    rgba(255, 214, 170, 0.42),
+    rgba(255, 190, 130, 0.14) 56%,
+    transparent 76%
+  );
+  opacity: 0.3;
+  transition: opacity 600ms var(--ease-out);
+  pointer-events: none;
+}
+
+.hero__frame[data-hover='true'] .hero__spill {
+  opacity: 0.9;
+}
+
+/* ------------------------------------------------------------------ vignette
+   Darkens the corners of the artwork so the eye lands on the monitor, and
+   keeps the bottom-right corner from pulling attention away from the glass. */
+.hero__vignette {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(46% 40% at 91% 87%, rgba(24, 16, 12, 0.34), transparent 72%),
+    radial-gradient(125% 95% at 50% 42%, transparent 42%, rgba(24, 16, 12, 0.34) 100%);
+}
+
+/* ========================================================== the monitor glass
+   Absolutely placed with the same numbers as the geometry block above, so the
+   overlay is welded to the artwork. */
+.hero__screen {
+  position: absolute;
+  left: var(--screen-l);
+  top: var(--screen-t);
+  width: var(--screen-w);
+  height: var(--screen-h);
+  overflow: hidden;
+  border-radius: 2px;
+  background: var(--bg-base);
+  box-shadow: 0 0 0 6px #0b0b10;   /* <- add this line */
+}
+
+/* The page that lives on the glass. Viewport-sized, so it lays out with
+   exactly the same CSS as the page it will become. */
+.hero__mini {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--vw, 100vw);
+  height: var(--vh, 100svh);
+  transform: translate3d(-50%, -50%, 0) translate3d(var(--mini-dx, 0px),
+      var(--mini-dy, 0px), 0) scale(var(--mini-k, 0.24));
+  transform-origin: 50% 50%;
+  pointer-events: none;
+}
+
+.hero__mini-page {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg-base);
+}
+
+/* The first button "gets hovered" by the wandering cursor, in step with it. */
+.hero__mini .hero__actions > :first-child {
+  transform-origin: left center;
+  animation: screen-btn var(--cursor-loop) ease-in-out var(--cursor-delay) infinite;
+}
+
+@keyframes screen-btn {
+  0%,
+  34%,
+  60%,
+  100% {
+    transform: scale(1);
+  }
+  42%,
+  54% {
+    transform: scale(1.08);
+  }
+}
+
+/* ------------------------------------------------------------------- glass
+   Sits on top of the page so it reads as a display, not a sticker. All layers
+   fade out together as the zoom closes in (--glass-a), so the page lands at
+   its true colours. */
+.hero__glass {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: var(--glass-a);
+}
+
+.hero__glass > span {
+  position: absolute;
+  inset: 0;
+}
+
+/* Warm light from the room and a touch of dimming: a lit panel is never as
+   bright as paper under the same lamp. */
+.hero__glass-tint {
+  background:
+    linear-gradient(180deg, rgba(255, 176, 102, 0.11), rgba(255, 150, 90, 0.05)),
+    rgba(30, 18, 10, 0.06);
+}
+
+/* Faint scanlines. */
+.hero__glass-scan {
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.05) 0,
+    rgba(0, 0, 0, 0.05) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  opacity: 0.6;
+}
+
+/* Edges of the panel are darker than the middle. */
+.hero__glass-vig {
+  background: radial-gradient(120% 110% at 50% 45%, transparent 52%, rgba(10, 12, 32, 0.32) 100%);
+  box-shadow: inset 0 0 14px rgba(8, 10, 28, 0.45);
+}
+
+/* A diagonal reflection. Bigger than the screen so it can slide: --gx / --gy
+   are written by Hero.jsx while the mouse moves over the monitor. */
+.hero__glass-glare {
+  inset: -30% -10%;
+  background: linear-gradient(
+    115deg,
+    transparent 36%,
+    rgba(255, 255, 255, 0.16) 46%,
+    rgba(255, 255, 255, 0.05) 54%,
+    transparent 62%
+  );
+  transform: translate3d(var(--gx, 0px), var(--gy, 0px), 0);
+  transition: transform 500ms var(--ease-out);
+  will-change: transform;
+}
+
+/* A barely-there brightness flicker, like a real panel. */
+.hero__glass-flicker {
+  background: #fff;
+  opacity: 0;
+  animation: screen-flicker 7s linear infinite;
+}
+
+@keyframes screen-flicker {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  8% {
+    opacity: 0.035;
+  }
+  9% {
+    opacity: 0;
+  }
+  47% {
+    opacity: 0;
+  }
+  48% {
+    opacity: 0.05;
+  }
+  50% {
+    opacity: 0.01;
+  }
+  51% {
+    opacity: 0;
+  }
+  80% {
+    opacity: 0.025;
+  }
+  82% {
+    opacity: 0;
+  }
+}
+
+/* ------------------------------------------------------------------ cursor
+   Positioned in unscaled glass pixels (--sw / --sh come from the intro hook),
+   moved with transform only. */
+.hero__cursor-wrap {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: calc(1 - clamp(0, var(--intro-p, 0) * 8, 1));
+}
+
+.hero__cursor {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: block;
+  opacity: 1;
+  transition: opacity 250ms var(--ease-out);
+  transform: translate3d(calc(var(--sw, 520px) * 0.74), calc(var(--sh, 260px) * 0.28), 0);
+  animation: screen-cursor var(--cursor-loop) ease-in-out var(--cursor-delay) infinite;
+  will-change: transform;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.35));
+}
+
+/* Real mouse over the monitor: hide the pretend one, the real pointer is
+   already a hand there. */
+.hero__frame[data-hover='true'] .hero__cursor {
+  opacity: 0;
+}
+
+@keyframes screen-cursor {
+  0% {
+    transform: translate3d(calc(var(--sw, 520px) * 0.74), calc(var(--sh, 260px) * 0.28), 0);
+  }
+  18% {
+    transform: translate3d(calc(var(--sw, 520px) * 0.5), calc(var(--sh, 260px) * 0.44), 0);
+  }
+  38%,
+  54% {
+    transform: translate3d(calc(var(--sw, 520px) * 0.2), calc(var(--sh, 260px) * 0.72), 0);
+  }
+  76% {
+    transform: translate3d(calc(var(--sw, 520px) * 0.76), calc(var(--sh, 260px) * 0.64), 0);
+  }
+  100% {
+    transform: translate3d(calc(var(--sw, 520px) * 0.74), calc(var(--sh, 260px) * 0.28), 0);
+  }
+}
+
+/* ----------------------------------------------------------------- power-on
+   Black until the room has loaded, then: a white line opens across the screen,
+   grows to fill it, and fades into the page. Plays once. */
+.hero__boot {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  pointer-events: none;
+  background: #06070c;
+  opacity: 1;
+}
+
+.hero__boot-line {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, #fff 18%, #fff 82%, transparent);
+  opacity: 0;
+  transform: scale(0, 0.006);
+}
+
+.hero__frame[data-loaded='true'] .hero__boot {
+  animation: boot-bg 1900ms var(--ease-out) 350ms both;
+}
+
+.hero__frame[data-loaded='true'] .hero__boot-line {
+  animation: boot-line 1500ms ease-out 350ms both;
+}
+
+@keyframes boot-bg {
+  0%,
+  55% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes boot-line {
+  0% {
+    transform: scale(0, 0.006);
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  38% {
+    transform: scale(1, 0.006);
+    opacity: 1;
+  }
+  62% {
+    transform: scale(1, 1);
+    opacity: 0.85;
+  }
+  100% {
+    transform: scale(1, 1);
+    opacity: 0;
+  }
+}
+
+/* ------------------------------------------------------- click / tap target
+   Invisible button over the glass. The frame itself ignores the pointer (so
+   the page underneath keeps scrolling), this one re-enables it. */
+.hero__screen-hit {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  pointer-events: auto;
+  touch-action: pan-y;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.hero__screen-hit:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+/* ============================================================ the real page
+   Only mounted once the screen has opened — never at the same time as the
+   copy on the glass. */
+.hero__real {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
+
+.hero__page {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg-base);
+}
+
+/* =========================================================================
+   THE HINT
+   ========================================================================= */
+.hero__hint {
+  position: absolute;
+  left: 50%;
+  bottom: 2.2vh;
+  z-index: 40;
+  translate: -50% 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-3);
+  opacity: calc(1 - clamp(0, var(--intro-p, 0) * 14, 1));
+}
+
+.hero__hint-label {
+  font-size: var(--fs-xs);
+  letter-spacing: 0.16em;
+  text-transform: lowercase;
+  animation: hint-in 900ms var(--ease-out) 1400ms both;
+}
+
+.hero__hint-arrow {
+  display: grid;
+  place-items: center;
+  color: var(--text-2);
+  animation:
+    hint-in 900ms var(--ease-out) 1400ms both,
+    hint-bounce 2.1s var(--ease-in-out) 1400ms infinite;
+}
+
+@keyframes hint-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes hint-bounce {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  45% {
+    transform: translate3d(0, 7px, 0);
+  }
+}
+
+/* Keyboard / screen-reader escape hatch, only visible on focus. */
+.hero__skip {
+  position: absolute;
+  top: 0.75rem;
+  left: 50%;
+  z-index: 60;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-pill);
+  background: var(--bg-raised);
+  color: var(--text-1);
+  font-size: var(--fs-xs);
+  text-decoration: none;
+  transform: translate(-50%, -200%);
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+
+.hero__skip:focus-visible {
+  transform: translate(-50%, 0);
+}
+
+/* =========================================================================
+   REDUCED MOTION / NO JAVASCRIPT
+   Nothing room-related is rendered in this mode (see Hero.jsx): no picture,
+   no zoom, no dust — just a full-height section with the hero in it.
+   ========================================================================= */
+.hero[data-intro='off'] {
+  min-height: 100svh;
+}
+
+.hero[data-intro='off'] .hero__stage {
+  position: relative;
+  height: auto;
+  overflow: visible;
+}
+
+/* Normally the page hangs off the pinned stage as an overlay; with nothing to
+   pin it has to carry the section's height itself, or the hero collapses. */
+.hero[data-intro='off'] .hero__real {
+  position: relative;
+  inset: auto;
+}
+
+.hero[data-intro='off'] .hero__page {
+  height: auto;
+  overflow: visible;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__hint-arrow,
+  .hero__hint-label,
+  .hero__ray,
+  .hero__dust,
+  .hero__glow,
+  .hero__glass-flicker,
+  .hero__cursor,
+  .hero__mini .hero__actions > :first-child {
+    animation: none;
+  }
+
+  .hero__glass-glare,
+  .hero__spill {
+    transition: none;
+  }
+}
+
+/* Phones have no mouse: no hover light, no sliding reflection, and a lighter
+   screen (no scanlines, no flicker). */
+@media (hover: none) {
+  .hero__glass-scan,
+  .hero__glass-flicker {
+    display: none;
+  }
+}
+
+/* =========================================================================
+   LENIS
+   The smooth-scroll library moves the page itself, so the browser's own
+   `scroll-behavior: smooth` must stand down — two of them at once is what
+   makes a page feel like it is fighting the cursor.
+   ========================================================================= */
+.has-lenis {
+  scroll-behavior: auto;
+}

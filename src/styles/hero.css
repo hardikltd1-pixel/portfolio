@@ -1,0 +1,414 @@
+/* ===========================================================================
+   HERO + TERMINAL
+
+   The hero's chrome (height, sticky stage, the monitor, the room picture and
+   the dust) all live in room.css. This file only styles the CONTENT that ends
+   up on the screen.
+   ======================================================================== */
+
+/* The old staggered entrance (.hero-in) and the old scroll cue (.hero__cue)
+   are both gone: the hero now arrives by being the monitor screen, and the
+   scroll cue is the "scroll to enter" hint in room.css. */
+
+.hero__inner {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  /* Reserve room for the navbar that slides in as the zoom finishes. */
+  padding-top: calc(var(--nav-h) + clamp(2rem, 6vh, 4.5rem));
+  padding-bottom: clamp(4rem, 10vh, 7rem);
+}
+
+/* ------------------------------------------------ the preview navbar strip
+   A visual echo of the real Navbar, drawn inside the screen so the monitor
+   looks like it is showing this site. Non-interactive and aria-hidden; the real
+   Navbar fades in at the end of the intro in the same position.
+
+   Handing over: faded out by `--intro-p`, which the intro writes on the hero as
+   the scroll moves. Doing it in CSS rather than a tween matters because this
+   strip sits inside the monitor overlay, which the zoom hook owns from the
+   first frame — there is no separate timeline to attach a tween to. */
+.screen-nav {
+  opacity: clamp(0, calc((0.94 - var(--intro-p, 0)) * 6.25), 1);
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: clamp(1rem, 3vw, 2.5rem);
+  height: var(--nav-h);
+  padding-inline: clamp(1.15rem, 4vw, 2.5rem);
+}
+
+.screen-nav__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.screen-nav__mark {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--surface-1);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+}
+
+.screen-nav__name {
+  font-size: var(--fs-sm);
+}
+
+.screen-nav__links {
+  display: flex;
+  gap: clamp(0.9rem, 2.4vw, 1.9rem);
+  margin-inline-start: auto;
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+}
+
+.screen-nav__link {
+  letter-spacing: 0.04em;
+}
+
+.screen-nav__pill {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 26px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  background: var(--surface-1);
+}
+
+.screen-nav__pill-dot {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0.8;
+}
+
+/* ------------------------------------------------------------- status */
+.hero__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.4rem 0.9rem 0.4rem 0.75rem;
+  margin-bottom: clamp(1.5rem, 4vh, 2.25rem);
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  background: var(--surface-1);
+  color: var(--text-2);
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.02em;
+}
+
+.hero__dot {
+  position: relative;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+/* Expanding ring — the only looping animation in the hero, kept tiny.
+
+   `animation-delay` is negative so the loop starts part-way round rather than at
+   the beginning. `--hero-clock` is how far into the shared hero clock this copy
+   was mounted (see lib/clock), which is what keeps the ring from snapping back to
+   its start when the real hero replaces the copy on the monitor screen. */
+.hero__dot::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0.55;
+  animation: hero-ping 2.6s var(--ease-out) var(--hero-clock, 0ms) infinite;
+}
+
+@keyframes hero-ping {
+  0% {
+    transform: scale(1);
+    opacity: 0.55;
+  }
+  70%,
+  100% {
+    transform: scale(2.8);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__dot::after {
+    animation: none;
+    opacity: 0;
+  }
+}
+
+/* -------------------------------------------------------------- title */
+.hero__title {
+  max-width: 16ch;
+  color: var(--text-1);
+}
+
+.hero__name {
+  position: relative;
+  color: var(--accent);
+  /* Accent underline drawn with a gradient so it needs no extra element. */
+  background-image: linear-gradient(90deg, var(--accent-line), transparent);
+  background-repeat: no-repeat;
+  background-size: 100% 1px;
+  background-position: 0 92%;
+  padding-bottom: 0.06em;
+}
+
+.hero__roles {
+  margin-top: 1.15rem;
+  font-family: var(--font-mono);
+  font-size: clamp(0.86rem, 0.8rem + 0.3vw, 1rem);
+  letter-spacing: 0.06em;
+  color: var(--text-3);
+}
+
+.hero__rule {
+  display: block;
+  width: 100%;
+  max-width: 480px;
+  height: 1px;
+  margin-block: clamp(1.75rem, 4vh, 2.5rem);
+  background: linear-gradient(90deg, var(--accent-line), var(--line-soft) 55%, transparent);
+}
+
+/* ------------------------------------------------------ copy + actions */
+.hero__body {
+  display: grid;
+  gap: clamp(2.25rem, 5vw, 3.5rem);
+  align-items: start;
+}
+
+.hero__intro {
+  font-size: var(--fs-lead);
+  color: var(--text-2);
+  max-width: 46ch;
+}
+
+.hero__highlight {
+  margin-top: 0.85rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.05rem, 0.95rem + 0.5vw, 1.3rem);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--text-1);
+}
+
+.hero__highlight::before {
+  content: '> ';
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+}
+
+.hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: clamp(1.75rem, 4vh, 2.25rem);
+}
+
+/* ---------------------------------------------------------- meta strip */
+.hero__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem clamp(1rem, 3vw, 2rem);
+  margin-top: clamp(1.75rem, 4vh, 2.25rem);
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--line-soft);
+}
+
+.hero__meta li {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.hero__meta-key {
+  color: var(--text-3);
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.hero__meta-key::after {
+  content: ':';
+  margin-left: 0.25em;
+}
+
+.hero__meta-value {
+  color: var(--text-2);
+  font-size: var(--fs-sm);
+  overflow-wrap: anywhere;
+}
+
+/* ===========================================================================
+   TERMINAL CARD
+   ======================================================================== */
+
+.terminal {
+  position: relative;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--bg-inset);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+}
+
+/* Faint accent rim on the top-left corner only — subtle depth. */
+.terminal::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(150deg, var(--accent-wash), transparent 34%);
+}
+
+.terminal__bar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.7rem 0.9rem;
+  border-bottom: 1px solid var(--line-soft);
+  background: var(--surface-1);
+}
+
+.terminal__dots {
+  display: flex;
+  gap: 6px;
+}
+
+.terminal__dots i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--surface-3);
+}
+
+.terminal__dots i:first-child {
+  background: var(--accent-line);
+}
+
+.terminal__path {
+  color: var(--text-3);
+  font-size: 0.7rem;
+}
+
+.terminal__bar-spacer {
+  margin-left: auto;
+}
+
+.terminal__body {
+  padding: 1.15rem 1.15rem 1.35rem;
+  min-height: 168px;
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono);
+  line-height: 1.9;
+}
+
+.terminal__line {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.terminal__line--pending {
+  opacity: 0.55;
+}
+
+.terminal__prompt {
+  color: var(--accent);
+}
+
+.terminal__command {
+  color: var(--text-1);
+}
+
+.terminal__command::after {
+  content: ':';
+  color: var(--text-3);
+}
+
+.terminal__value {
+  color: var(--text-2);
+}
+
+.terminal__line:last-child .terminal__value {
+  color: var(--accent);
+}
+
+.terminal__caret {
+  display: inline-block;
+  width: 7px;
+  height: 1em;
+  translate: 0 2px;
+  background: var(--accent);
+  /* Phase-locked to the shared hero clock, for the same reason as the ping. */
+  animation: caret-blink 1.05s steps(1) var(--hero-clock, 0ms) infinite;
+}
+
+@keyframes caret-blink {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .terminal__caret {
+    animation: none;
+  }
+}
+
+/* ===========================================================================
+   RESPONSIVE
+   ======================================================================== */
+
+@media (min-width: 900px) {
+  .hero__body {
+    grid-template-columns: minmax(0, 1.06fr) minmax(0, 0.94fr);
+    gap: clamp(3rem, 6vw, 5rem);
+    align-items: center;
+  }
+
+  .hero__title {
+    max-width: 20ch;
+  }
+}
+
+@media (max-width: 560px) {
+  .hero__actions .btn {
+    flex: 1 1 100%;
+  }
+
+  .terminal__body {
+    padding-inline: 0.9rem;
+    font-size: 0.74rem;
+  }
+}
