@@ -22,7 +22,7 @@ export const SCROLL_FX = {
    * How long ScrollTrigger takes to catch up with the scrollbar.
    * 0.8–1 feels heavy and deliberate; below ~0.5 it starts to feel loose.
    */
-  scrub: 0.9,
+  scrub: 0.45,
   /** Distance a piece of content travels while revealing. */
   distance: 44,
   /** Extra distance per 1ms of stagger delay, so siblings cascade. */

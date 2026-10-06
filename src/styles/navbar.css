@@ -386,3 +386,30 @@
     display: none;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   Touch-first layouts
+   Some mobile browsers can expose a wider CSS viewport (for example when
+   "desktop site" is enabled). The pointer-capability query keeps the mobile
+   navigation usable even in that case.
+   --------------------------------------------------------------------------- */
+@media (hover: none), (pointer: coarse) {
+  .nav__links,
+  .nav__github {
+    display: none;
+  }
+
+  .nav__toggle {
+    display: grid;
+  }
+
+  .nav__panel {
+    display: block;
+  }
+}
+
+@media (hover: none) and (max-width: 720px), (pointer: coarse) and (max-width: 720px) {
+  .nav__brand-name {
+    display: none;
+  }
+}

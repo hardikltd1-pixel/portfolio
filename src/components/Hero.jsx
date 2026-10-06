@@ -157,7 +157,7 @@ export default function Hero() {
                 muted
                 loop
                 playsInline
-                preload="auto"
+                preload="metadata"
                 aria-hidden="true"
                 tabIndex={-1}
                 data-ready={ready}

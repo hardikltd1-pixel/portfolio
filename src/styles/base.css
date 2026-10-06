@@ -16,6 +16,7 @@ html {
   -webkit-text-size-adjust: 100%;
   scroll-behavior: smooth;
   scroll-padding-top: var(--nav-h);
+  width: 100%;
   /* `clip` (not `hidden`) contains stray transforms without creating a
      scroll container, which would break position: sticky / fixed. */
   overflow-x: clip;

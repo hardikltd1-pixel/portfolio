@@ -34,7 +34,8 @@ export function useScrollReveal(ref, { variant = 'up', delay = 0 } = {}) {
 
   useLayoutEffect(() => {
     const node = ref.current
-    if (!node || reduced) return undefined
+    const touch = window.matchMedia('(max-width: 767px), (hover: none), (pointer: coarse)').matches
+    if (!node || reduced || touch) return undefined
 
     const { variant: v, delay: d } = keepRef.current
     const distance = DISTANCE[v] ?? DISTANCE.up

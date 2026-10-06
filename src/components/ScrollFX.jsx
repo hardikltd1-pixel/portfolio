@@ -25,7 +25,8 @@ export default function ScrollFX() {
   const reduced = useReducedMotion()
 
   useLayoutEffect(() => {
-    if (reduced) return undefined
+    const touch = window.matchMedia('(max-width: 767px), (hover: none), (pointer: coarse)').matches
+    if (reduced || touch) return undefined
 
     const teardown = []
 

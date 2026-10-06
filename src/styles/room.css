@@ -715,3 +715,27 @@
 .has-lenis {
   scroll-behavior: auto;
 }
+
+/* ---------------------------------------------------------------------------
+   Mobile: the room intro is disabled by useRoomIntro. Keep the fallback
+   completely ordinary so the hero becomes a normal document section instead
+   of a sticky viewport-sized layer.
+   --------------------------------------------------------------------------- */
+@media (max-width: 767px), (hover: none), (pointer: coarse) {
+  .hero[data-intro='off'] {
+    height: auto;
+    min-height: 100svh;
+  }
+
+  .hero[data-intro='off'] .hero__stage {
+    min-height: 0;
+  }
+
+  .hero[data-intro='off'] .hero__page {
+    min-height: 100svh;
+  }
+
+  .hero[data-intro='off'] .hero__inner {
+    min-height: 100svh;
+  }
+}

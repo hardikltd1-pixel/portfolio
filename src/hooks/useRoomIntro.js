@@ -87,12 +87,38 @@ const CSS_VARS = [
 
 export default function useRoomIntro() {
   const reduced = prefersReducedMotion()
+  const [mobile, setMobile] = useState(() =>
+    typeof window !== 'undefined' &&
+    window.matchMedia('(max-width: 767px), (hover: none), (pointer: coarse)').matches,
+  )
 
-  const [phase, setPhase] = useState(reduced ? 'off' : 'on')
+  useEffect(() => {
+    if (typeof window === 'undefined') return undefined
+    const media = window.matchMedia('(max-width: 767px), (hover: none), (pointer: coarse)')
+    const update = () => setMobile(media.matches)
+    update()
+    media.addEventListener?.('change', update)
+    return () => media.removeEventListener?.('change', update)
+  }, [])
+
+  const [phase, setPhase] = useState(reduced || mobile ? 'off' : 'on')
   const sectionRef = useRef(null)
+
+  /*
+   * Mobile/coarse-pointer devices use the normal hero immediately.
+   * The cinematic monitor intro is intentionally desktop-only: it combines a
+   * sticky zoom, video, blur/mix-blend layers and scroll-linked JS. Removing
+   * that work on phones keeps touch scrolling native and prevents the page
+   * from feeling like it is lagging behind the finger.
+   */
 
   /* Publishes the phase on <html> so the stylesheet owns the navbar handover
      without React re-rendering anything. */
+  useEffect(() => {
+    if (reduced || mobile) setPhase('off')
+    else setPhase((current) => (current === 'off' ? 'on' : current))
+  }, [reduced, mobile])
+
   useEffect(() => {
     const root = document.documentElement
     root.dataset.heroIntro = phase === 'on' ? 'playing' : phase
@@ -102,7 +128,7 @@ export default function useRoomIntro() {
   }, [phase])
 
   useLayoutEffect(() => {
-    if (reduced) return undefined
+    if (reduced || mobile) return undefined
 
     const section = sectionRef.current
     if (!section) return undefined
@@ -265,7 +291,7 @@ export default function useRoomIntro() {
       tween.kill()
       CSS_VARS.forEach((name) => section.style.removeProperty(name))
     }
-  }, [reduced])
+  }, [reduced, mobile])
 
   return { phase, sectionRef }
 }
