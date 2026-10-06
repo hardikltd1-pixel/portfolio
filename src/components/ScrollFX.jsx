@@ -26,7 +26,7 @@ export default function ScrollFX() {
 
   useLayoutEffect(() => {
     const touch = window.matchMedia('(max-width: 767px), (hover: none), (pointer: coarse)').matches
-    if (reduced || touch) return undefined
+    if (reduced) return undefined
 
     const teardown = []
 
@@ -44,7 +44,7 @@ export default function ScrollFX() {
             trigger,
             start,
             end,
-            scrub: SCROLL_FX.scrub,
+            scrub: touch ? 0.16 : SCROLL_FX.scrub,
             invalidateOnRefresh: true,
           },
         },

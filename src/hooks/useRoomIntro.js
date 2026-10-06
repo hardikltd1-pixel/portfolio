@@ -101,21 +101,19 @@ export default function useRoomIntro() {
     return () => media.removeEventListener?.('change', update)
   }, [])
 
-  const [phase, setPhase] = useState(reduced || mobile ? 'off' : 'on')
+  const [phase, setPhase] = useState(reduced ? 'off' : 'on')
   const sectionRef = useRef(null)
 
   /*
-   * Mobile/coarse-pointer devices use the normal hero immediately.
-   * The cinematic monitor intro is intentionally desktop-only: it combines a
-   * sticky zoom, video, blur/mix-blend layers and scroll-linked JS. Removing
-   * that work on phones keeps touch scrolling native and prevents the page
-   * from feeling like it is lagging behind the finger.
+   * The cinematic intro runs on phones too, but with a shorter travel distance
+   * and tighter scrub. Lenis remains disabled on touch devices so native touch
+   * scrolling stays responsive while this intro follows the scroll position.
    */
 
   /* Publishes the phase on <html> so the stylesheet owns the navbar handover
      without React re-rendering anything. */
   useEffect(() => {
-    if (reduced || mobile) setPhase('off')
+    if (reduced) setPhase('off')
     else setPhase((current) => (current === 'off' ? 'on' : current))
   }, [reduced, mobile])
 
@@ -128,7 +126,7 @@ export default function useRoomIntro() {
   }, [phase])
 
   useLayoutEffect(() => {
-    if (reduced || mobile) return undefined
+    if (reduced) return undefined
 
     const section = sectionRef.current
     if (!section) return undefined
@@ -139,7 +137,9 @@ export default function useRoomIntro() {
     if (!stage || !frame || !screen) return undefined
 
     /* One source of truth for the scroll distance. */
-    section.style.setProperty('--intro-len', `${INTRO.length * 100}svh`)
+    const introScrub = mobile ? 0.22 : INTRO.scrub
+    const introLength = mobile ? 0.82 : INTRO.length
+    section.style.setProperty('--intro-len', `${introLength * 100}svh`)
 
     let layout = null
     let progress = 0
@@ -267,7 +267,7 @@ export default function useRoomIntro() {
         trigger: section,
         start: 'top top',
         end: 'bottom bottom',
-        scrub: INTRO.scrub,
+        scrub: introScrub,
         invalidateOnRefresh: true,
         onRefresh: () => {
           measure()

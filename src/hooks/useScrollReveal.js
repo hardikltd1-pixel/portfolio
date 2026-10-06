@@ -35,7 +35,7 @@ export function useScrollReveal(ref, { variant = 'up', delay = 0 } = {}) {
   useLayoutEffect(() => {
     const node = ref.current
     const touch = window.matchMedia('(max-width: 767px), (hover: none), (pointer: coarse)').matches
-    if (!node || reduced || touch) return undefined
+    if (!node || reduced) return undefined
 
     const { variant: v, delay: d } = keepRef.current
     const distance = DISTANCE[v] ?? DISTANCE.up
@@ -65,7 +65,7 @@ export function useScrollReveal(ref, { variant = 'up', delay = 0 } = {}) {
           start: () =>
             `top ${window.innerHeight * SCROLL_FX.startAt - d * SCROLL_FX.staggerPx}px`,
           end: () => `top ${window.innerHeight * SCROLL_FX.endAt}px`,
-          scrub: SCROLL_FX.scrub,
+          scrub: touch ? 0.16 : SCROLL_FX.scrub,
           invalidateOnRefresh: true,
         },
       },
