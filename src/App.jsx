@@ -15,6 +15,8 @@ import Contact from './components/Contact'
 import Footer from './components/Footer'
 import { NoticeProvider } from './hooks/useNotice'
 import { useSmoothScroll } from './hooks/useSmoothScroll'
+import { syncPerfAttribute } from './lib/device'
+import { useEffect } from 'react'
 
 import './styles/tokens.css'
 import './styles/base.css'
@@ -35,6 +37,7 @@ import './styles/footer.css'
 
 export default function App() {
   useSmoothScroll()
+  useEffect(() => syncPerfAttribute(), [])
 
   return (
     <NoticeProvider>

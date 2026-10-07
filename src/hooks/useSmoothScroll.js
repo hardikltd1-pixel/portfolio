@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { createSmoothScroll, destroySmoothScroll } from '../lib/lenis'
+import { useLiteMode } from '../lib/device'
 
 /**
  * Starts Lenis for the lifetime of the app.
@@ -12,8 +13,13 @@ import { createSmoothScroll, destroySmoothScroll } from '../lib/lenis'
  * checks that itself and returns null.
  */
 export function useSmoothScroll() {
+  const lite = useLiteMode()
+
   useEffect(() => {
+    /* Phones scroll natively: the browser's own touch scrolling is already
+       smooth, and a JS scroll layer on top of it only adds lag. */
+    if (lite) return undefined
     createSmoothScroll()
     return destroySmoothScroll
-  }, [])
+  }, [lite])
 }

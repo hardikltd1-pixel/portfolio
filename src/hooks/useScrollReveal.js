@@ -1,6 +1,7 @@
 import { useLayoutEffect, useRef } from 'react'
 import { gsap, SCROLL_FX } from '../lib/gsap'
 import { useReducedMotion } from './useReducedMotion'
+import { useLiteMode } from '../lib/device'
 
 /** How far each reveal variant travels before it lands. */
 const DISTANCE = {
@@ -29,13 +30,15 @@ const DISTANCE = {
  */
 export function useScrollReveal(ref, { variant = 'up', delay = 0 } = {}) {
   const reduced = useReducedMotion()
+  /* On phones the one-shot CSS reveal (useInView) is used instead: dozens of
+     scrubbed ScrollTriggers are what made scrolling feel slow there. */
+  const lite = useLiteMode()
   const keepRef = useRef({ variant, delay })
   keepRef.current = { variant, delay }
 
   useLayoutEffect(() => {
     const node = ref.current
-    const touch = window.matchMedia('(max-width: 767px), (hover: none), (pointer: coarse)').matches
-    if (!node || reduced) return undefined
+    if (!node || reduced || lite) return undefined
 
     const { variant: v, delay: d } = keepRef.current
     const distance = DISTANCE[v] ?? DISTANCE.up
@@ -65,7 +68,7 @@ export function useScrollReveal(ref, { variant = 'up', delay = 0 } = {}) {
           start: () =>
             `top ${window.innerHeight * SCROLL_FX.startAt - d * SCROLL_FX.staggerPx}px`,
           end: () => `top ${window.innerHeight * SCROLL_FX.endAt}px`,
-          scrub: touch ? 0.16 : SCROLL_FX.scrub,
+          scrub: SCROLL_FX.scrub,
           invalidateOnRefresh: true,
         },
       },
@@ -73,7 +76,7 @@ export function useScrollReveal(ref, { variant = 'up', delay = 0 } = {}) {
 
     return () => {
       tween.scrollTrigger?.kill()
-      tween.kill()
+      tween.revert()
     }
-  }, [reduced])
+  }, [reduced, lite])
 }

@@ -1,6 +1,7 @@
 import { useLayoutEffect } from 'react'
 import { gsap, ScrollTrigger, SCROLL_FX } from '../lib/gsap'
 import { useReducedMotion } from '../hooks/useReducedMotion'
+import { useLiteMode } from '../lib/device'
 
 /**
  * Page-level scroll-linked animation.
@@ -23,10 +24,34 @@ import { useReducedMotion } from '../hooks/useReducedMotion'
  */
 export default function ScrollFX() {
   const reduced = useReducedMotion()
+  const lite = useLiteMode()
+
+  /* Phones: no scrubbed tweens. The skill bars fill once when they scroll
+     into view (CSS transition); everything else simply shows its final state. */
+  useLayoutEffect(() => {
+    if (reduced || !lite || typeof IntersectionObserver === 'undefined') return undefined
+
+    const fills = document.querySelectorAll('[data-meter-fill]')
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return
+          entry.target.classList.add('is-filled')
+          observer.unobserve(entry.target)
+        })
+      },
+      { rootMargin: '0px 0px -8% 0px' },
+    )
+    fills.forEach((fill) => observer.observe(fill))
+
+    return () => {
+      observer.disconnect()
+      fills.forEach((fill) => fill.classList.remove('is-filled'))
+    }
+  }, [reduced, lite])
 
   useLayoutEffect(() => {
-    const touch = window.matchMedia('(max-width: 767px), (hover: none), (pointer: coarse)').matches
-    if (reduced) return undefined
+    if (reduced || lite) return undefined
 
     const teardown = []
 
@@ -44,14 +69,14 @@ export default function ScrollFX() {
             trigger,
             start,
             end,
-            scrub: touch ? 0.16 : SCROLL_FX.scrub,
+            scrub: SCROLL_FX.scrub,
             invalidateOnRefresh: true,
           },
         },
       )
       teardown.push(() => {
         tween.scrollTrigger?.kill()
-        tween.kill()
+        tween.revert()
       })
     }
 
@@ -138,7 +163,7 @@ export default function ScrollFX() {
       window.clearTimeout(failsafe)
       teardown.forEach((fn) => fn())
     }
-  }, [reduced])
+  }, [reduced, lite])
 
   return null
 }

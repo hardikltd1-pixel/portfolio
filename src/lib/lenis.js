@@ -26,15 +26,8 @@ export function createSmoothScroll() {
   if (current) return current.lenis
   if (prefersReducedMotion()) return null
 
-  // Keep touch scrolling native. Lenis is useful on a mouse/trackpad desktop,
-  // but adding a second scroll animation layer on phones makes touch input
-  // feel delayed, especially while scroll-linked effects are active.
-  if (window.matchMedia('(max-width: 767px), (hover: none), (pointer: coarse)').matches) {
-    return null
-  }
-
   const lenis = new Lenis({
-    duration: 0.72,
+    duration: 1.15,
     easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
     smoothWheel: true,
     syncTouch: false,

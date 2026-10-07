@@ -3,6 +3,10 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 gsap.registerPlugin(ScrollTrigger)
 
+/* The mobile URL bar showing / hiding resizes the window; without this every
+   such resize triggers a full ScrollTrigger refresh (a visible hitch). */
+ScrollTrigger.config({ ignoreMobileResize: true })
+
 /**
  * Marks the document as GSAP-driven.
  *
@@ -22,7 +26,7 @@ export const SCROLL_FX = {
    * How long ScrollTrigger takes to catch up with the scrollbar.
    * 0.8–1 feels heavy and deliberate; below ~0.5 it starts to feel loose.
    */
-  scrub: 0.45,
+  scrub: 0.9,
   /** Distance a piece of content travels while revealing. */
   distance: 44,
   /** Extra distance per 1ms of stagger delay, so siblings cascade. */

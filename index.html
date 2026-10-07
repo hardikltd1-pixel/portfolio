@@ -37,6 +37,13 @@
       ;(function () {
         var root = document.documentElement
         root.classList.remove('no-js')
+        // Phones / touch / narrow windows get the lightweight version.
+        // Keep this query in sync with LITE_QUERY in src/lib/device.js.
+        try {
+          root.dataset.perf = window.matchMedia('(max-width: 900px), (hover: none), (pointer: coarse)').matches ? 'lite' : 'full'
+        } catch (error) {
+          root.dataset.perf = 'full'
+        }
         try {
           var saved = window.localStorage.getItem('portfolio-theme')
           root.dataset.theme = saved === 'light' || saved === 'dark' ? saved : 'light'

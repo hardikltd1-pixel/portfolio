@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { gsap, ScrollTrigger } from '../lib/gsap'
 import { prefersReducedMotion } from './useReducedMotion'
+import { useLiteMode } from '../lib/device'
 
 /**
  * The pinned scroll that zooms the room into the website.
@@ -33,8 +34,25 @@ import { prefersReducedMotion } from './useReducedMotion'
  *   .hero__page occupies. The phase then flips and Hero mounts the page and
  *   removes the copy in one commit: no duplicate id, no second timer.
  *
+ * PHONES / TOUCH / NARROW WINDOWS
+ *   The zoom is skipped there (see lib/device.js): the monitor is far wider than a
+ *   portrait screen, so the glass was cropped and the page looked cut in half,
+ *   and re-rasterising the scaled room every frame is what made it crawl. They
+ *   get phase 'off' — an ordinary hero section.
+ *
+ * PERFORMANCE
+ *   - Per-frame values are written straight onto the few elements that use
+ *     them. They used to be CSS variables on <section class="hero">, which
+ *     forces the browser to re-check the style of the whole hero subtree
+ *     (typing text, terminal, 20 dust motes...) on every scroll tick.
+ *   - While the zoom is moving the frame is promoted to its own GPU layer
+ *     (will-change: transform) so scaling it is a texture op. Once scrolling
+ *     stops the promotion is dropped so the text re-rasterises crisp.
+ *   - Room animations and the video are paused once the room is hidden or the
+ *     hero is off screen.
+ *
  * PHASES
- *   'off'  reduced motion — the hero is just the hero.
+ *   'off'  reduced motion / phone — the hero is just the hero.
  *   'on'   the monitor owns the content.
  *   'done' the screen has opened and the real page has taken over.
  *
@@ -67,6 +85,10 @@ const EDGE = 1.02
 /** Contain the copy only while it stays at least this wide on the glass. */
 const FIT_MIN = 0.6
 
+/** Where the room fades out (progress). Mirrors the old CSS custom properties. */
+const ROOM_FADE_FROM = 0.55
+const ROOM_FADE_TO = 0.92
+
 const CSS_VARS = [
   '--intro-len',
   '--intro-p',
@@ -87,36 +109,19 @@ const CSS_VARS = [
 
 export default function useRoomIntro() {
   const reduced = prefersReducedMotion()
-  const [mobile, setMobile] = useState(() =>
-    typeof window !== 'undefined' &&
-    window.matchMedia('(max-width: 767px), (hover: none), (pointer: coarse)').matches,
-  )
+  const lite = useLiteMode()
+  const off = reduced || lite
 
-  useEffect(() => {
-    if (typeof window === 'undefined') return undefined
-    const media = window.matchMedia('(max-width: 767px), (hover: none), (pointer: coarse)')
-    const update = () => setMobile(media.matches)
-    update()
-    media.addEventListener?.('change', update)
-    return () => media.removeEventListener?.('change', update)
-  }, [])
-
-  const [phase, setPhase] = useState(reduced ? 'off' : 'on')
+  const [phase, setPhase] = useState(off ? 'off' : 'on')
   const sectionRef = useRef(null)
 
-  /*
-   * The cinematic intro runs on phones too, but with a shorter travel distance
-   * and tighter scrub. Lenis remains disabled on touch devices so native touch
-   * scrolling stays responsive while this intro follows the scroll position.
-   */
+  /* The window can cross the phone / desktop line (rotation, resize). */
+  useEffect(() => {
+    setPhase(off ? 'off' : 'on')
+  }, [off])
 
   /* Publishes the phase on <html> so the stylesheet owns the navbar handover
      without React re-rendering anything. */
-  useEffect(() => {
-    if (reduced) setPhase('off')
-    else setPhase((current) => (current === 'off' ? 'on' : current))
-  }, [reduced, mobile])
-
   useEffect(() => {
     const root = document.documentElement
     root.dataset.heroIntro = phase === 'on' ? 'playing' : phase
@@ -126,7 +131,7 @@ export default function useRoomIntro() {
   }, [phase])
 
   useLayoutEffect(() => {
-    if (reduced) return undefined
+    if (off) return undefined
 
     const section = sectionRef.current
     if (!section) return undefined
@@ -136,10 +141,22 @@ export default function useRoomIntro() {
     const screen = section.querySelector('.hero__screen')
     if (!stage || !frame || !screen) return undefined
 
+    /* Elements whose style is written every frame. Some of them are mounted
+       and unmounted by the handoff, so they are looked up lazily. */
+    const cache = {}
+    const find = (key, selector) => {
+      const node = cache[key]
+      if (node && node.isConnected) return node
+      cache[key] = section.querySelector(selector)
+      return cache[key]
+    }
+    const clamp01 = (n) => (n < 0 ? 0 : n > 1 ? 1 : n)
+    const video = frame.querySelector('video')
+    const PLAYING = { room: true, visible: true }
+    let settleTimer = 0
+
     /* One source of truth for the scroll distance. */
-    const introScrub = mobile ? 0.22 : INTRO.scrub
-    const introLength = mobile ? 0.82 : INTRO.length
-    section.style.setProperty('--intro-len', `${introLength * 100}svh`)
+    section.style.setProperty('--intro-len', `${INTRO.length * 100}svh`)
 
     let layout = null
     let progress = 0
@@ -164,12 +181,11 @@ export default function useRoomIntro() {
          to whole pixels, which leaves a visible seam at the handoff. A
          refresh can run mid-zoom, so the frame is measured at rest first —
          the reset and the reads happen inside one task, so nothing paints. */
-      const zoomed = section.style.getPropertyValue('--zoom-s')
-      section.style.setProperty('--zoom-s', '1')
+      const zoomed = frame.style.transform
+      frame.style.transform = 'scale(1)'
       const frameBox = frame.getBoundingClientRect()
       const glassBox = screen.getBoundingClientRect()
-      if (zoomed) section.style.setProperty('--zoom-s', zoomed)
-      else section.style.removeProperty('--zoom-s')
+      frame.style.transform = zoomed
 
       /* Frame-relative: the anchor maths below works in the frame's own box. */
       const sl = glassBox.left - frameBox.left
@@ -233,16 +249,40 @@ export default function useRoomIntro() {
       /* Apparent size of the copy inside the glass, before the glass scales. */
       const fit = layout.k0 + value * (1 - layout.k0)
 
-      set('--intro-p', value.toFixed(4))
-      set('--zoom-s', scale.toFixed(4))
-      set('--mini-k', (fit / scale).toFixed(5))
-      /* While the glass crops the copy (a narrow phone), pin it to the top so
-         the headline stays in frame; once the glass is taller than the copy
-         — always true by the handoff — it centres itself again. */
-      set(
-        '--mini-dy',
-        `${(Math.max(0, layout.vh * fit - layout.sh * scale) / (2 * scale)).toFixed(1)}px`,
-      )
+      const roomA = 1 - clamp01((value - ROOM_FADE_FROM) / (ROOM_FADE_TO - ROOM_FADE_FROM))
+      const dy = Math.max(0, layout.vh * fit - layout.sh * scale) / (2 * scale)
+
+      /* Promote while moving, demote once scrolling has stopped (crisp text). */
+      frame.style.willChange = 'transform'
+      window.clearTimeout(settleTimer)
+      settleTimer = window.setTimeout(() => {
+        frame.style.willChange = ''
+      }, 160)
+
+      frame.style.transform = `scale(${scale.toFixed(4)})`
+
+      const room = find('room', '.hero__room')
+      if (room) {
+        room.style.opacity = roomA.toFixed(3)
+        room.style.visibility = roomA <= 0.001 ? 'hidden' : ''
+      }
+      PLAYING.room = roomA > 0.001
+      syncMedia()
+
+      const glass = find('glass', '.hero__glass')
+      if (glass) glass.style.opacity = (1 - clamp01(value * 1.6)).toFixed(3)
+      const cursor = find('cursor', '.hero__cursor-wrap')
+      if (cursor) cursor.style.opacity = (1 - clamp01(value * 8)).toFixed(3)
+      const hint = find('hint', '.hero__hint')
+      if (hint) hint.style.opacity = (1 - clamp01(value * 14)).toFixed(3)
+      const navEcho = find('navEcho', '.screen-nav')
+      if (navEcho) navEcho.style.opacity = clamp01((0.94 - value) * 6.25).toFixed(3)
+
+      /* Scale of the copy inside the screen, kept at the top of a cropped glass. */
+      const mini = find('mini', '.hero__mini')
+      if (mini) {
+        mini.style.transform = `translate3d(-50%, -50%, 0) translate3d(0, ${dy.toFixed(1)}px, 0) scale(${(fit / scale).toFixed(5)})`
+      }
 
       const nowDone = value >= INTRO.doneAt
       if (nowDone !== done) {
@@ -250,6 +290,22 @@ export default function useRoomIntro() {
         setPhase(done ? 'done' : 'on')
       }
     }
+
+    /* Pause the video and every looping room animation while nobody can see
+       them: the room has faded out, or the hero has scrolled away. */
+    function syncMedia() {
+      const run = PLAYING.room && PLAYING.visible
+      section.dataset.live = run ? 'true' : 'false'
+      if (!video) return
+      if (run && video.paused) video.play()?.catch(() => {})
+      else if (!run && !video.paused) video.pause()
+    }
+
+    const visibility = new IntersectionObserver(([entry]) => {
+      PLAYING.visible = entry.isIntersecting
+      syncMedia()
+    })
+    visibility.observe(section)
 
     measure()
     apply(0)
@@ -267,7 +323,7 @@ export default function useRoomIntro() {
         trigger: section,
         start: 'top top',
         end: 'bottom bottom',
-        scrub: introScrub,
+        scrub: INTRO.scrub,
         invalidateOnRefresh: true,
         onRefresh: () => {
           measure()
@@ -287,11 +343,24 @@ export default function useRoomIntro() {
 
     return () => {
       observer.disconnect()
+      visibility.disconnect()
+      window.clearTimeout(settleTimer)
       tween.scrollTrigger?.kill()
       tween.kill()
       CSS_VARS.forEach((name) => section.style.removeProperty(name))
+      frame.style.transform = ''
+      frame.style.willChange = ''
+      delete section.dataset.live
+      ;['room', 'glass', 'cursor', 'hint', 'navEcho', 'mini'].forEach((key) => {
+        const node = cache[key]
+        if (node) {
+          node.style.opacity = ''
+          node.style.visibility = ''
+          node.style.transform = ''
+        }
+      })
     }
-  }, [reduced, mobile])
+  }, [off])
 
   return { phase, sectionRef }
 }

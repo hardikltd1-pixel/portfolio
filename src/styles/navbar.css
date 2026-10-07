@@ -387,29 +387,11 @@
   }
 }
 
-/* ---------------------------------------------------------------------------
-   Touch-first layouts
-   Some mobile browsers can expose a wider CSS viewport (for example when
-   "desktop site" is enabled). The pointer-capability query keeps the mobile
-   navigation usable even in that case.
-   --------------------------------------------------------------------------- */
-@media (hover: none), (pointer: coarse) {
-  .nav__links,
-  .nav__github {
-    display: none;
-  }
-
-  .nav__toggle {
-    display: grid;
-  }
-
-  .nav__panel {
-    display: block;
-  }
-}
-
-@media (hover: none) and (max-width: 720px), (pointer: coarse) and (max-width: 720px) {
-  .nav__brand-name {
-    display: none;
-  }
+/* Phones: solid colour instead of a live blur of everything scrolling
+   underneath (backdrop-filter is one of the costliest effects on mobile GPUs). */
+html[data-perf='lite'] .nav[data-scrolled='true'],
+html[data-perf='lite'] .nav__panel {
+  background: var(--bg-base);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
 }

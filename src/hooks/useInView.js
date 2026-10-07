@@ -95,14 +95,13 @@ export function useInView({ threshold, rootMargin, once = true, enabled = true }
       },
     )
 
+    /* IntersectionObserver is enough on its own. The old extra scroll listener
+       (one per element, each reading layout every frame) is only needed when
+       IO is missing, which is handled above. */
     observer.observe(node)
-    window.addEventListener('scroll', onScroll, { passive: true })
-    window.addEventListener('resize', onScroll, { passive: true })
 
     return () => {
       observer.disconnect()
-      window.removeEventListener('scroll', onScroll)
-      window.removeEventListener('resize', onScroll)
       if (frame) window.cancelAnimationFrame(frame)
     }
   }, [threshold, rootMargin, once, enabled])

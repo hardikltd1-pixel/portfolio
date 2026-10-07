@@ -3,6 +3,7 @@ import HeroContent from './HeroContent'
 import useRoomIntro from '../hooks/useRoomIntro'
 import { scrollToSection } from '../lib/scroll'
 import { getLenis } from '../lib/lenis'
+import { useLiteMode } from '../lib/device'
 
 /**
  * Hero — the room, the monitor, and the zoom into the site.
@@ -34,8 +35,8 @@ import { getLenis } from '../lib/lenis'
  *     the site.
  */
 
-/* Twenty motes, positions fixed so nothing re-randomises between renders. */
-const DUST = Array.from({ length: 20 }, (_, index) => {
+/* Ten motes, positions fixed so nothing re-randomises between renders. */
+const DUST = Array.from({ length: 10 }, (_, index) => {
   const a = (((index * 47) % 100) + 0.5) / 100
   const b = (((index * 29 + 13) % 100) + 0.5) / 100
   const c = (((index * 61 + 7) % 100) + 0.5) / 100
@@ -53,6 +54,7 @@ const DUST = Array.from({ length: 20 }, (_, index) => {
 
 export default function Hero() {
   const { phase, sectionRef } = useRoomIntro()
+  const lite = useLiteMode()
   const [loaded, setLoaded] = useState(false)
   const [ready, setReady] = useState(false)
 
@@ -157,7 +159,7 @@ export default function Hero() {
                 muted
                 loop
                 playsInline
-                preload="metadata"
+                preload="auto"
                 aria-hidden="true"
                 tabIndex={-1}
                 data-ready={ready}
@@ -238,6 +240,21 @@ export default function Hero() {
 
         {open && (
           <div className="hero__real">
+            {/* Phones: a still of the room instead of the pinned zoom. */}
+            {lite && (
+              <figure className="hero__lite-room" aria-hidden="true">
+                <img
+                  src="/images/room-m.webp"
+                  srcSet="/images/room-m.webp 900w, /images/room.webp 2400w"
+                  sizes="100vw"
+                  alt=""
+                  width="900"
+                  height="600"
+                  decoding="async"
+                  fetchpriority="high"
+                />
+              </figure>
+            )}
             <div className="hero__page">
               <HeroContent />
             </div>
@@ -261,17 +278,19 @@ export default function Hero() {
         )}
       </div>
 
-      {/* Keyboard / screen-reader way past the intro. */}
-      <a
-        className="hero__skip"
-        href="#about"
-        onClick={(event) => {
-          event.preventDefault()
-          scrollToSection('about')
-        }}
-      >
-        Skip introduction
-      </a>
+      {/* Keyboard / screen-reader way past the intro (only while there is one). */}
+      {!introOff && (
+        <a
+          className="hero__skip"
+          href="#about"
+          onClick={(event) => {
+            event.preventDefault()
+            scrollToSection('about')
+          }}
+        >
+          Skip introduction
+        </a>
+      )}
     </section>
   )
 }

@@ -316,16 +316,27 @@
    ScrollTrigger drives inline styles, so the CSS-transition fallback is
    switched off to avoid two systems animating the same opacity.
    --------------------------------------------------------------------- */
-.has-gsap .reveal {
+/* Desktop only: on phones the CSS transition IS the reveal. */
+html:not([data-perf='lite']).has-gsap .reveal {
   transition: none;
 }
 
-.has-gsap .journey__rail-fill {
+html:not([data-perf='lite']).has-gsap .journey__rail-fill {
   transition: none;
 }
 
 .has-gsap .skill__meter-fill {
   /* Width comes from GSAP's scaleX; the CSS value is the fallback. */
+  transform: scaleX(var(--meter, 0.5));
+}
+
+/* Phones: bars start empty and fill once when scrolled into view. */
+html[data-perf='lite'].has-gsap .skill__meter-fill {
+  transform: scaleX(0);
+  transition: transform 900ms var(--ease-out);
+}
+
+html[data-perf='lite'].has-gsap .skill__meter-fill.is-filled {
   transform: scaleX(var(--meter, 0.5));
 }
 
@@ -360,24 +371,5 @@
 
   .btn {
     transform: none;
-  }
-}
-
-
-/* Touch devices do not run the GSAP scroll-reveal engine. Show content in its
-   final state instead of leaving the desktop animation's initial opacity in
-   place. This removes a large amount of scroll-linked work from phones. */
-@media (max-width: 767px), (hover: none), (pointer: coarse) {
-  .has-gsap .reveal {
-    opacity: 1 !important;
-    transform: none !important;
-  }
-
-  .has-gsap .journey__rail-fill {
-    transform: scaleY(1) !important;
-  }
-
-  .has-gsap .skill__meter-fill {
-    transform: scaleX(var(--meter, 0.5)) !important;
   }
 }
