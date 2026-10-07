@@ -1,9 +1,21 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import HeroContent from './HeroContent'
 import useRoomIntro from '../hooks/useRoomIntro'
 import { scrollToSection } from '../lib/scroll'
 import { getLenis } from '../lib/lenis'
 import { useLiteMode } from '../lib/device'
+import { prefersReducedMotion } from '../hooks/useReducedMotion'
+
+/* Phones play the room video too: it is hardware-decoded, so it costs almost
+   nothing. Skipped on Data Saver / 2G, where the still stays. It is a muted,
+   gentle loop, so the OS "reduce motion" flag (often switched on by phone
+   battery savers) does not block it. */
+function canPlayLiteVideo() {
+  const connection = navigator.connection
+  if (connection?.saveData) return false
+  if (connection?.effectiveType && /(^|-)2g$/.test(connection.effectiveType)) return false
+  return true
+}
 
 /**
  * Hero — the room, the monitor, and the zoom into the site.
@@ -55,6 +67,48 @@ const DUST = Array.from({ length: 10 }, (_, index) => {
 export default function Hero() {
   const { phase, sectionRef } = useRoomIntro()
   const lite = useLiteMode()
+  const liteVideoRef = useRef(null)
+  const [liteVideoReady, setLiteVideoReady] = useState(false)
+  const [debugText, setDebugText] = useState('')
+  const debug = typeof location !== 'undefined' && /[?&]debug=1/.test(location.search)
+  const liteVideo = lite && canPlayLiteVideo()
+
+  /* Play only while the picture is on screen (saves battery). */
+  useEffect(() => {
+    const video = liteVideoRef.current
+    if (!liteVideo || !video || typeof IntersectionObserver === 'undefined') return undefined
+    /* Some phones block autoplay (Low Power Mode, battery saver). If so, the
+       first touch counts as a user gesture and starts it. */
+    if (debug) {
+      const report = (event) => {
+        const c = navigator.connection
+        setDebugText(
+          `${event} | ready:${video.readyState} paused:${video.paused} err:${video.error ? video.error.code : '-'} ` +
+            `| reduced:${prefersReducedMotion()} saveData:${c ? c.saveData : 'n/a'} net:${c ? c.effectiveType : 'n/a'}`,
+        )
+      }
+      ;['loadeddata', 'playing', 'pause', 'error', 'stalled', 'suspend'].forEach((name) =>
+        video.addEventListener(name, () => report(name)),
+      )
+      report('init')
+    }
+
+    const startOnTouch = () => video.play()?.catch(() => {})
+    const tryPlay = () =>
+      video.play()?.catch(() => {
+        window.addEventListener('touchstart', startOnTouch, { once: true, passive: true })
+      })
+
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) tryPlay()
+      else video.pause()
+    })
+    observer.observe(video)
+    return () => {
+      observer.disconnect()
+      window.removeEventListener('touchstart', startOnTouch)
+    }
+  }, [liteVideo, debug])
   const [loaded, setLoaded] = useState(false)
   const [ready, setReady] = useState(false)
 
@@ -253,6 +307,41 @@ export default function Hero() {
                   decoding="async"
                   fetchpriority="high"
                 />
+                {liteVideo && (
+                  <video
+                    ref={liteVideoRef}
+                    className="hero__lite-video"
+                    src="/videos/room.mp4"
+                    poster="/images/room-m.webp"
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    preload="metadata"
+                    disablePictureInPicture
+                    tabIndex={-1}
+                    data-ready={liteVideoReady}
+                    onPlaying={() => setLiteVideoReady(true)}
+                    onError={() => setLiteVideoReady(false)}
+                  />
+                )}
+                {debug && (
+                  <figcaption
+                    style={{
+                      position: 'absolute',
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      zIndex: 5,
+                      padding: '4px 6px',
+                      background: 'rgba(0,0,0,.75)',
+                      color: '#0f0',
+                      font: '10px/1.3 monospace',
+                    }}
+                  >
+                    {debugText || (liteVideo ? 'waiting...' : 'video skipped (saveData/2g)')}
+                  </figcaption>
+                )}
               </figure>
             )}
             <div className="hero__page">
