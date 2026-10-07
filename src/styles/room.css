@@ -731,8 +731,8 @@
 .hero__lite-room {
   position: relative;
   margin: calc(var(--nav-h) + 0.5rem) var(--gutter) 0;
-  aspect-ratio: 3 / 2;
-  max-height: 38svh;
+  aspect-ratio: 8 / 5;
+  max-height: 42svh;
   width: auto;
   overflow: hidden;
   border-radius: var(--r-lg);
@@ -745,8 +745,8 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  /* Keep the monitor and desk in frame on a wide crop. */
-  object-position: 38% 52%;
+  /* Keep the monitor, PC and the swaying curtain / window in frame. */
+  object-position: 85% 50%;
 }
 
 .hero__lite-room::after {
@@ -769,7 +769,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: 38% 52%;
+  object-position: 85% 50%;
   opacity: 0;
   transition: opacity 500ms var(--ease-out);
 }
